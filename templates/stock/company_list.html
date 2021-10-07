@@ -1,0 +1,9 @@
+{% if company_list %}
+    <ul>
+    {% for company in company_list %}
+    <li><a href = "{% url '127.0.0.1:8000'  %}">{{ company.name }}</a></li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>질문이 없습니다</p>
+{% endif %}
