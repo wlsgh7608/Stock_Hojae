@@ -7,6 +7,9 @@ from rest_framework.decorators import api_view
 
 @api_view(['GET'])
 def us_stocklist_view(request,*args,**kwargs):
+    """
+    미국주식 리스트 출력
+    """
     stocklist = UsStocklist.objects.all()
     serializer = UsStockListSerailzer(stocklist,many = True)
     return Response(serializer.data)

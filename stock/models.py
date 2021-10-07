@@ -23,14 +23,14 @@ class Company(models.Model):
 
 
 class Daily(models.Model):
-    code = models.ForeignKey(Company,on_delete=CASCADE)
+    company_code = models.ForeignKey(UsStocklist,on_delete=CASCADE)
     company_name = models.CharField(max_length=40)
     date = models.DateField()
     open = models.IntegerField()
     high = models.IntegerField()
     low = models.IntegerField()
     close = models.IntegerField()
-    volume = models.IntegerField
+    volume = models.IntegerField()
 
     def __str__(self):
         return self.company_name

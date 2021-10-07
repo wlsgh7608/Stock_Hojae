@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
 from pathlib import Path
+from django.core.exceptions import ImproperlyConfigured
+import os, json
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,7 +22,22 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-a#u&z=!!+rn!m(e7u2k-60ys-a&94900wrbd#@_vwssm8f8(eu'
+
+secret_file = os.path.join(BASE_DIR,'secret.json')
+
+with open(secret_file) as f:
+    secrets = json.loads(f.read())
+
+def get_secret(setting,setting2 = None,secrets = secrets):
+    try:
+        if setting2 is None:
+            return secrets[setting]
+        else:
+            return secrets[setting][setting2]
+    except KeyError:
+        error_msg = "Set the {setting} environmnet variable."
+        raise ImproperlyConfigured(error_msg)
+SECRET_KEY = get_secret("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -81,11 +98,11 @@ WSGI_APPLICATION = 'hojae.wsgi.application'
 DATABASES = {
     'default':{
     'ENGINE':'django.db.backends.postgresql',
-    'NAME':'hojae',
-    'USER':'postgres',
-    'PASSWORD':'wlsgh7608',
-    'HOST':'localhost',
-    'PORT':'5432',
+    'NAME': get_secret("DATABASES","NAME"),
+    'USER': get_secret("DATABASES","USER"),
+    'PASSWORD': get_secret("DATABASES","PASSWORD"),
+    'HOST': get_secret("DATABASES","HOST"),
+    'PORT': get_secret("DATABASES","PORT"),
 }
 }
 

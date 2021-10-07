@@ -6,7 +6,7 @@ from .views import (
 
 """
 CLIENT
-Base ENDPOINT   /api/tweets/
+Base ENDPOINT   /api/stock/
 
 """
 
