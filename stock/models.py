@@ -13,6 +13,41 @@ class UsStocklist(models.Model):
         managed = False
         db_table = 'us_stocklist'
 
+
+
+
+
+
+class UsCompanyDaily(models.Model):
+    id = models.AutoField(primary_key=True,auto_created=True)
+    stock_date = models.DateField()
+    company_code = models.ForeignKey(UsStocklist,on_delete=CASCADE)
+    close = models.FloatField(blank = True, null = True)
+    open = models.FloatField(blank = True, null = True)
+    high = models.FloatField(blank = True, null = True)
+    low = models.FloatField(blank = True, null = True)
+    volume = models.IntegerField(blank = True, null = True)
+    change = models.FloatField(blank = True, null = True)
+    class Meta:
+        unique_together =(('company_code','stock_date'),)
+        ordering = ['-stock_date']
+
+# class UsCompanyDay(models.Model):
+#     id = models.AutoField(primary_key=True,auto_created=True)
+#     stock_date = models.DateField()
+#     company_code = models.ForeignKey(UsStocklist,on_delete=CASCADE)
+#     close = models.FloatField(blank = True, null = True)
+#     open = models.FloatField(blank = True, null = True)
+#     high = models.FloatField(blank = True, null = True)
+#     low = models.FloatField(blank = True, null = True)
+#     volume = models.IntegerField(blank = True, null = True)
+#     change = models.FloatField(blank = True, null = True)
+#     class Meta:
+#         unique_together =(('company_code','stock_date'),)
+#         ordering = ['-stock_date']
+
+class newDay(models.Model):
+    abc = models.CharField(max_length=50)
 class Company(models.Model):
     code = models.CharField(max_length=20)
     name = models.CharField(max_length=40)
@@ -20,17 +55,3 @@ class Company(models.Model):
 
     def __str__(self):
         return self.company
-
-
-class Daily(models.Model):
-    company_code = models.ForeignKey(UsStocklist,on_delete=CASCADE)
-    company_name = models.CharField(max_length=40)
-    date = models.DateField()
-    open = models.IntegerField()
-    high = models.IntegerField()
-    low = models.IntegerField()
-    close = models.IntegerField()
-    volume = models.IntegerField()
-
-    def __str__(self):
-        return self.company_name

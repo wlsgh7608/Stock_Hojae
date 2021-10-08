@@ -8,6 +8,7 @@ class CRUD(Databases):
             self.db.commit()
         except Exception as e :
             print(" insert DB err ",e) 
+            # self.cursor.rollback()
     
     def readDB(self,schema,table,column):
         sql = " SELECT {column} from {schema}.{table}".format(column=column,schema=schema,table=table)
@@ -26,6 +27,7 @@ class CRUD(Databases):
             self.cursor.execute(sql)
             self.db.commit()
         except Exception as e :
+            
             print(" update DB err",e)
 
     def deleteDB(self,schema,table,condition):
