@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+
+<html lang="ko">
+
+<head>
+    <title>{% block title %} Hojae stock platform {% endblock %} </title>
+    {% load static %}
+    <link rel='stylesheet' type="text/css" href="{% static 'css/base.css' %}" />
+    <link rel='stylesheet' type='text/css' href="{% block extrastyle %}{% endblock %}" />
+</head>
+
+<body>
+    <div id='header'>
+        <h2 class='maintitle'>Easy&amp;Fast Django Web Programming</h2>
+        {% if user.is_active %}
+        <h4 class='welcome'>Welcome,
+            <strong>{% firstof user.get_short_name user.get_username %}</strong>/
+            <a href="#">Change Password</a>
+            <a href="#">Logout</a>
+        </h4>
+        {% else %}
+        <h4 class='welcome'>Welcome, Anonymous /
+            <a href="#">Login</a>
+            <a href="#">Register</a>
+        </h4>
+        {% endif %}
+        </h4>
+    </div>
+    <div id='menu'>
+        <li><a href="#">Home</a></li>
+        <li><a href="#">Bookmark</a></li>
+        <li><a href="#">Blog</a></li>
+        <li><a href="#">Photo</a></li>
+
+        <li> Add&bigtriangledown;
+            <ul>
+                <li> <a href="#">Bookmark</a></li>
+                <li> <a href="#">Blog</a></li>
+                <li> <a href="#">Album</a></li>
+                <li> <a href="#">Photo</a></li>
+            </ul>
+        </li>
+        <li>Change&bigtriangledown;
+            <ul>
+                <li><a href="#">Bookmark</a></li>
+                <li><a href="#">Blog</a></li>
+                <li><a href="#">Album</a></li>
+                <li><a href="#">Photo</a></li>
+            </ul>
+        </li>
+
+        <li> <a href="#">Archive</a></li>
+        <li> <a href="#">Search</a></li>
+        <li> <a href="#">Admin</a></li>
+    </div>
+
+    {% block content %}{% endblock %}
+    {% block footer %}{% endblock %}
+</body>
+
+</html>

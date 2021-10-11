@@ -20,7 +20,5 @@ def us_stockdaily_view(request,symbol,*args,**kwargs):
     주식 일일데이터 출력
     """
     stock = UsCompanyDaily.objects.filter(company_code=symbol)
-    print("++++++++++++++++++++++++++++++++")
-    print(stock)
     serializer = UsStockDailySerializer(stock,many = True)
     return Response(serializer.data)

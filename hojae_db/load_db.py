@@ -126,5 +126,5 @@ def create_us_stocklist():
     # print(ticker)
 
 if __name__ == '__main__':
-   create_us_stockinfo()
-    # print(fdr.DataReader('RDSb','2010'))
+#    create_us_stockinfo()
+    print(fdr.DataReader('TSLA','2010'))

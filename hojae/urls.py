@@ -15,10 +15,12 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path,include
+from hojae.views import HomeView
 
 urlpatterns = [
     # path('pybo/', include('pybo.urls')),
     path('admin/', admin.site.urls),
+    path('',HomeView.as_view()),
     path('pybo/', include('pybo.urls')),
     path('stock/', include('stock.urls')),
     path('api/stock/',include('stock.api.urls')),
