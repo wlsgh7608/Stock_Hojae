@@ -31,8 +31,7 @@ class CRUD(Databases):
             print(" update DB err",e)
 
     def deleteDB(self,schema,table,condition):
-        sql = " delete from {schema}.{table} where {condition} ; ".format(schema=schema,table=table,
-        condition=condition)
+        sql = " DELETE FROM {schema}.{table} WHERE {condition} ; ".format(schema=schema,table=table, condition=condition)
         try :
             self.cursor.execute(sql)
             self.db.commit()

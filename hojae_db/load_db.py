@@ -20,27 +20,17 @@ def create_table_us_stocklist():
             symbol VARCHAR(20) PRIMARY KEY,
             name VARCHAR(100) NOT NULL,
             industry VARCHAR(50) NOT NULL,
-            industry_id INTEGER NOT NULL,
+            industry_id INTEGER NOT NULL
         )""",
         
     )
-    conn = psycopg2.connect(host = 'localhost',dbname = 'hojae',user= 'postgres',password = 'wlsgh7608',port = '5432')
+    conn = psycopg2.connect(host = '192.168.55.107',dbname = 'hojae',user= 'postgres',password = 'wlsgh7608',port = '5432')
     cur = conn.cursor()
     for command in commands:
         print(command)
         cur.execute(command)
         conn.commit()
-def create_table_us_stockinfo():
-    commands = (
-        """
-        CREATE TABLE us_stocklist(
-            symbol VARCHAR(20) PRIMARY KEY,
-            name VARCHAR(100) NOT NULL,
-            industry VARCHAR(50) NOT NULL,
-            industry_id INTEGER NOT NULL,
-        )""",
         
-    )
 
 def create_us_stockinfo():
     """
@@ -79,13 +69,6 @@ def create_us_stockinfo():
 
                 db.insertDB(schema='public',table='stock_uscompanydaily',column=column,data=data)
         sleep(5)
-            
-
-                    
-
-            
-
-            # print(symbol_data)
         
     
 
@@ -97,16 +80,14 @@ def create_us_stockinfo():
 
 def create_us_stocklist():
     """
-    나스닥,뉴욕,아멕스 각 시가총액기준 상위 100개 기업(total : 300) db에 업데이트
+    나스닥,뉴욕 각 100개 기업(total : 200) db에 업데이트
     """
     today = datetime.datetime.now().strftime('%Y-%m-%d')
     print(today)
     data = db_id.db_identification()
     df_nasdaq= fdr.StockListing('NASDAQ')[:100]
     df_nyse = fdr.StockListing('NYSE') [:100]
-    df_amex = fdr.StockListing('AMEX')[:100]
-    df = pd.concat([df_nasdaq,df_nyse,df_amex])
-    # df = df_nasdaq
+    df = pd.concat([df_nasdaq,df_nyse])
     insertsql = """insert into us_stocklist (symbol, name, industry, industry_id) values (%s, %s, %s, %d),"""
 
     db = CRUD()
@@ -120,11 +101,37 @@ def create_us_stocklist():
         data = symbol,name,industry,int(industry_id)
         db.insertDB(schema='public',table='us_stocklist',column=column,data=data)
     
+def drop_us_stocklist():
+    df_amex = fdr.StockListing('AMEX')
+    conn = psycopg2.connect(host='192.168.55.107', dbname='hojae',user='postgres',password='wlsgh7608',port=5432)
+    # database = Databases()
 
+    
+    # print(database.execute('SELECT symbol FROM us_stocklist;'))
+    # database.commit
 
-# for i,ticker in enumerate(df):
-    # print(ticker)
+    # db = CRUD()
+    for i,row in enumerate(df_amex.itertuples()):
+
+        _,symbol,  name , industry, industry_id  = row # unpacking
+        cursor = conn.cursor()
+        print(cursor.execute(f"select * from us_stocklist where symbol = 'NML';"))
+        # print(cursor.execute(f"SELECT * from us_stocklist where symbol = '{symbol}';"))
+        # cursor.execute(f"DELETE from us_stocklist where symbol = '{symbol}';")
+        # database.commit()
+        # cunn.close()
+    #     table = 'us_stocklist'
+    #     condition = f"symbol = '{symbol}'"
+    #     db.deleteDB(schema= 'public',table = table,condition = condition)
+        
+
+    
+
 
 if __name__ == '__main__':
-#    create_us_stockinfo()
-    print(fdr.DataReader('TSLA','2010'))
+    # create_table_us_stocklist()
+    # create_table_us_stockinfo()
+    # create_us_stocklist()
+    create_us_stockinfo()
+    # drop_us_stocklist()
+    
