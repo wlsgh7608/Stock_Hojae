@@ -81,8 +81,7 @@ def create_us_stockinfo():
                 change = round(change,5)
                 column = "company_code_id,stock_date,close,open,high,low,volume,change"
                 data = c_name,s_date,close,open,high,low,volume,change
-
-                # db.insertDB(schema='public',table='stock_uscompanydaily',column=column,data=data)
+                db.insertDB(schema='public',table='stock_uscompanydaily',column=column,data=data)
         sleep(5)
 
 def create_us_stocklist():
@@ -110,11 +109,7 @@ def create_us_stocklist():
 def create_us_incomestatement():
     """
     기업 손익계산서
-
-    
     """    
-    
-
     database = Databases()
 
     sql = "SELECT DISTINCT symbol FROM us_stocklist" #db에 저장된 기업리스트
@@ -125,69 +120,83 @@ def create_us_incomestatement():
 
     for i,symbol in enumerate(db_stock_list):
         print(i,symbol)
-        if i>=147:
+        symbol = db_stock_list[i]
+        query_symbol = symbol.replace('.','-') # 티커명 yahoofinance에 맞게 변경
+        df = si.get_income_statement(query_symbol,yearly=True)
 
+        income_site = "https://finance.yahoo.com/quote/" + symbol + \
+            "/financials?p=" + symbol
+        json_info = si._parse_json(income_site)
+        try:
+            currency = json_info["earnings"]['financialCurrency'] # 통화 parsing
+        except:
+            currency = 'USD'
+        multiple = float(get_today_currency(currency))
+        print('multiple : ',multiple)
+        df =df.mul(multiple)
+        column = ['totalRevenue','grossProfit','operatingIncome','netIncome']
+        df =df.loc[column,:].transpose()
+        
+        for j,row in enumerate(df.itertuples()):
+                _,totalRevenue,grossProfit,  operatingIncome , netIncome = row # unpacking
+                e_date = df.index[j]
+                e_date = e_date.strftime("%y-%m-%d")
+                column = "end_date,revenue,gross_profit,operating_income,net_income,company_code_id"
+                #정수범위때문에 전처리
+                totalRevenue,grossProfit,operatingIncome,netIncome= int(totalRevenue),int(grossProfit),int(operatingIncome),int(netIncome)
+                data = e_date,totalRevenue,grossProfit,  operatingIncome , netIncome,symbol
+                print(data)
+                db.insertDB(schema='public',table='incomestatement',column=column,data=data)
+        sleep(2)
+        
+def create_us_balancesheet():
+    """
+    기업 대차대조표
+    """    
+    database = Databases()
+
+    sql = "SELECT DISTINCT symbol FROM us_stocklist" #db에 저장된 기업리스트
+    curs = database.cursor
+    curs.execute(sql) 
+    db_stock_list = [item[0] for item in curs.fetchall()] # 기업 symbol리스트
+    db = CRUD()
+
+    for i,symbol in enumerate(db_stock_list):
+        if i>= 89:
+            print(i,symbol)
             symbol = db_stock_list[i]
-            query_symbol = symbol.replace('.','-')
-            df = si.get_income_statement(query_symbol,yearly=True)
+            query_symbol = symbol.replace('.','-') # 티커명 yahoofinance에 맞게 변경
+            df = si.get_balance_sheet(query_symbol,yearly=True)
 
             income_site = "https://finance.yahoo.com/quote/" + symbol + \
-                "/financials?p=" + symbol
+                "/balance-sheet?p=" + symbol
             json_info = si._parse_json(income_site)
             try:
                 currency = json_info["earnings"]['financialCurrency'] # 통화 parsing
             except:
+                print("currency not exist. So default USD")
                 currency = 'USD'
             multiple = float(get_today_currency(currency))
             print('multiple : ',multiple)
             df =df.mul(multiple)
-            column = ['totalRevenue','grossProfit','operatingIncome','netIncome']
-            df =df.loc[column,:].transpose()
+            column = ['totalLiab','totalStockholderEquity','totalAssets','totalCurrentAssets','totalCurrentLiabilities']
+            df = df.loc[column,:]
+            df = df.dropna(axis=1)
+            print(df)
+            df =df.transpose()
             
             for j,row in enumerate(df.itertuples()):
-                    _,totalRevenue,grossProfit,  operatingIncome , netIncome = row # unpacking
+                    _,totalLiab,totalStockholderEquity,  totalAssets , totalCurrentAssets ,totalCurrentLiabilities= row # unpacking
                     e_date = df.index[j]
                     e_date = e_date.strftime("%y-%m-%d")
-                    column = "end_date,revenue,gross_profit,operating_income,net_income,company_code_id"
+                    column = "end_date,total_liability,total_stockholder_equity,total_assets,total_current_assets,total_current_liability,company_code_id"
                     #정수범위때문에 전처리
-                    totalRevenue,grossProfit,operatingIncome,netIncome= int(totalRevenue),int(grossProfit),int(operatingIncome),int(netIncome)
-                    data = e_date,totalRevenue,grossProfit,  operatingIncome , netIncome,symbol
+                    totalLiab,totalStockholderEquity,totalAssets,= int(totalLiab),int(totalStockholderEquity),int(totalAssets)
+                    totalCurrentAssets,totalCurrentLiabilities = int(totalCurrentAssets),int(totalCurrentLiabilities)
+                    data = e_date,totalLiab,totalStockholderEquity,  totalAssets , totalCurrentAssets,totalCurrentLiabilities,symbol
                     print(data)
-                    db.insertDB(schema='public',table='incomestatement',column=column,data=data)
+                    db.insertDB(schema='public',table='balancesheet',column=column,data=data)
             sleep(2)
-
-
-
-       
-
-
-
-    AAPL  = si.get_income_statement('AAPL',yearly=True)
-
-def drop_us_stocklist():
-    df_amex = fdr.StockListing('AMEX')
-    conn = psycopg2.connect(host='192.168.55.107', dbname='hojae',user='postgres',password='wlsgh7608',port=5432)
-    # database = Databases()
-
-    
-    # print(database.execute('SELECT symbol FROM us_stocklist;'))
-    # database.commit
-
-    # db = CRUD()
-    for i,row in enumerate(df_amex.itertuples()):
-
-        _,symbol,  name , industry, industry_id  = row # unpacking
-        cursor = conn.cursor()
-        print(cursor.execute(f"select * from us_stocklist where symbol = 'NML';"))
-        # print(cursor.execute(f"SELECT * from us_stocklist where symbol = '{symbol}';"))
-        # cursor.execute(f"DELETE from us_stocklist where symbol = '{symbol}';")
-        # database.commit()
-        # cunn.close()
-    #     table = 'us_stocklist'
-    #     condition = f"symbol = '{symbol}'"
-    #     db.deleteDB(schema= 'public',table = table,condition = condition)
-        
-
     
 
 
@@ -196,6 +205,5 @@ if __name__ == '__main__':
     # create_table_us_stockinfo()
     # create_us_stocklist()
     # create_us_stockinfo()
-    # drop_us_stocklist()
-    create_us_incomestatement()
+    create_us_balancesheet()
     

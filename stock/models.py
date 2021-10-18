@@ -1,5 +1,7 @@
+from enum import unique
 from django.db import models
 from django.db.models.deletion import CASCADE
+from django.db.models.fields import BigIntegerField, IntegerField
 
 # Create your models here.
 
@@ -43,6 +45,23 @@ class IncomeStatement(models.Model):
         unique_together =(('company_code','end_date'),)
         ordering = ['-end_date']
        
+
+class BalanceSheet(models.Model):
+    id = models.AutoField(primary_key=True,auto_created=True)
+    company_code = models.ForeignKey(UsStocklist,on_delete=CASCADE, null= False,default ='')
+    end_date = models.DateField()# 날짜
+    
+    total_liability = BigIntegerField(default=0,null=True) # 총부채비용
+    total_stockholder_equity = BigIntegerField(default=0,null=True) # 자기자본
+    total_assets = BigIntegerField(default=0,null=True) # 총 자산
+    total_current_assets = BigIntegerField(default=0,null=True) # 유동 자산 : 1년 안에 현금화가능한 자산
+    total_current_liability = BigIntegerField(default=0,null=True) # 유동 부채 : 1년 안에 갚아야하는 자산
+
+    class Meta:
+        db_table = 'balancesheet'
+        unique_together =(('company_code','end_date'),)
+        ordering = ['-end_date']
+
 
 class notapply(models.Model):
     id = models.AutoField(primary_key=True,auto_created=True)

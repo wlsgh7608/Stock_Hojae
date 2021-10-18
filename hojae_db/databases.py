@@ -1,7 +1,7 @@
 import psycopg2
 class Databases():
     def __init__(self):
-        self.db = psycopg2.connect(host='110.15.224.150', dbname='hojae',user='postgres',password='wlsgh7608',port=5432)
+        self.db = psycopg2.connect(host='192.168.55.107', dbname='hojae',user='postgres',password='wlsgh7608',port=5432)
         self.cursor = self.db.cursor()
 
     def __del__(self):

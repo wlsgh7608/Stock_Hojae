@@ -1,7 +1,7 @@
 
 from stock import serializers
-from ..serializers import UsStockDailySerializer, UsStockListSerializer,IncomeStatementSerializer
-from ..models import UsStocklist,UsCompanyDaily,IncomeStatement
+from ..serializers import BalanceSheetSerializer, UsStockDailySerializer, UsStockListSerializer,IncomeStatementSerializer
+from ..models import BalanceSheet, UsStocklist,UsCompanyDaily,IncomeStatement
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 
@@ -26,7 +26,7 @@ def us_stockdaily_view(request,symbol,*args,**kwargs):
 @api_view(['GET'])
 def incomeStatement_view(request,symbol,*args,**kwargs):
     """
-    기업 손익계산서
+    기업 손익계산서( 단위 : $1,000)
     revenue : 매출
     gross_profit : 매출총이익 = 매출 - 매출원가
     operating_income : 영업이익 = 매출총이익 - (판매비+관리비)
@@ -35,4 +35,18 @@ def incomeStatement_view(request,symbol,*args,**kwargs):
     company = IncomeStatement.objects.filter(company_code=symbol)
     serializer = IncomeStatementSerializer(company,many = True)
     return Response(serializer.data)
-    
+
+
+@api_view(['GET'])
+def balanceSheet_view(request,symbol,*args,**kwargs):
+    """
+    기업 재무상태표( 단위 : $1,000)
+    total_liability : 총부채비용
+    total_stockholder_equity : 자기자본
+    total_assets : 총 자산
+    total_current_assets  유동 자산 = 1년 안에 현금화가능한 자산
+    total_current_liability 유동 부채 = 1년 안에 갚아야하는 자산
+    """
+    company = BalanceSheet.objects.filter(company_code=symbol)
+    serializer = BalanceSheetSerializer(company,many = True)
+    return Response(serializer.data)
