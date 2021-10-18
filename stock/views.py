@@ -10,8 +10,8 @@ import pandas as pd
 # Create your views here.
 def index(request):
     
-    # company_list = fdr.StockListing("NYSE")[:50]
-    # company_list = pd.concat(company_list, ignore_index=True)
+    company_list = fdr.StockListing("NYSE")[:50]
+    company_list = pd.concat(company_list, ignore_index=True)
     print(company_list)
     context = {'company_list':company_list}
     return render(request,'stock/company_list.html',context)

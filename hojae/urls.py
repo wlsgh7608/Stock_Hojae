@@ -24,4 +24,6 @@ urlpatterns = [
     path('pybo/', include('pybo.urls')),
     path('stock/', include('stock.urls')),
     path('api/stock/',include('stock.api.urls')),
+    # path('api-jwt-auth/',include('profiles.api.urls')),
+
 ]

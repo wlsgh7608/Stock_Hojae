@@ -3,6 +3,7 @@ from django.urls import path
 from .views import (
     us_stocklist_view,
     us_stockdaily_view,
+    incomeStatement_view
     
 )
 
@@ -16,6 +17,7 @@ urlpatterns = [
  
     path('',us_stocklist_view),
     path('<str:symbol>/',us_stockdaily_view),
+    path('<str:symbol>/incomestatement',incomeStatement_view),
    
 
  
