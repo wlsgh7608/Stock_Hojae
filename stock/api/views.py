@@ -4,15 +4,26 @@ from ..serializers import BalanceSheetSerializer, UsStockDailySerializer, UsStoc
 from ..models import BalanceSheet, UsStocklist,UsCompanyDaily,IncomeStatement
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
+from rest_framework.generics import ListAPIView
+from rest_framework.filters import SearchFilter,OrderingFilter
 
-@api_view(['GET'])
-def us_stocklist_view(request,*args,**kwargs):
+
+class StocklistView(ListAPIView):
     """
     미국주식 리스트 출력
     """
-    stocklist = UsStocklist.objects.all()
-    serializer = UsStockListSerializer(stocklist,many = True)
-    return Response(serializer.data)
+    queryset = UsStocklist.objects.all()
+    serializer_class = UsStockListSerializer
+    filter_backends = (SearchFilter,)
+    search_fields = ('symbol','name')
+
+
+# @api_view(['GET'])
+# def us_stocklist_view(request,*args,**kwargs):
+#     stocklist = UsStocklist.objects.all()
+#     serializer = UsStockListSerializer(stocklist,many = True)
+#     return Response(serializer.data)
+    
 
 @api_view(['GET'])
 def us_stockdaily_view(request,symbol,*args,**kwargs):
