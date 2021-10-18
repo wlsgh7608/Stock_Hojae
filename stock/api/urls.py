@@ -17,7 +17,7 @@ urlpatterns = [
  
     path('',us_stocklist_view),
     path('<str:symbol>/',us_stockdaily_view),
-    path('<str:symbol>/incomestatement',incomeStatement_view),
+    path('<str:symbol>/incomestatement/',incomeStatement_view),
    
 
  

@@ -10,9 +10,9 @@ Base ENDPOINT   /api-jwt-auth/
 """
 
 urlpatterns = [
-    # path('',obtain_jwt_token), #jwt 토큰 획득
-    # path('refresh/',refresh_jwt_token), # jwt 토큰 갱신
-    # path('verify/',verify_jwt_token), # jwt 토큰 확인
+    path('',obtain_jwt_token), #jwt 토큰 획득
+    path('refresh/',refresh_jwt_token), # jwt 토큰 갱신
+    path('verify/',verify_jwt_token), # jwt 토큰 확인
    
 
  

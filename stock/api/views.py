@@ -1,6 +1,6 @@
 
 from stock import serializers
-from ..serializers import UsStockDailySerializer, UsStockListSerailzer,IncomeStatementSerializer
+from ..serializers import UsStockDailySerializer, UsStockListSerializer,IncomeStatementSerializer
 from ..models import UsStocklist,UsCompanyDaily,IncomeStatement
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
@@ -11,7 +11,7 @@ def us_stocklist_view(request,*args,**kwargs):
     미국주식 리스트 출력
     """
     stocklist = UsStocklist.objects.all()
-    serializer = UsStockListSerailzer(stocklist,many = True)
+    serializer = UsStockListSerializer(stocklist,many = True)
     return Response(serializer.data)
 
 @api_view(['GET'])

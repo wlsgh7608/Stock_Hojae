@@ -38,7 +38,6 @@ class IncomeStatement(models.Model):
     operating_income = models.IntegerField(default= 0,null=True) # 영업이익 = 매출총이익 - (판매비+관리비)
     net_income = models.IntegerField(default = 0,null=True) # 당기순이익 = 세후 순이익
     
-    
     class Meta:
         db_table = 'incomestatement'
         unique_together =(('company_code','end_date'),)
