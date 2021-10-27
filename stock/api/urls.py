@@ -4,7 +4,9 @@ from .views import (
     us_stockdaily_view,
     incomeStatement_view,
     balanceSheet_view,
+    # us_stocklist_view,
     StocklistView,
+
     
 )
 
@@ -17,7 +19,7 @@ Base ENDPOINT   /api/stock/
 urlpatterns = [
  
     path('',StocklistView.as_view()),
-    # path('search/',StocklistView.as_view()),
+    # path('',us_stocklist_view),
     path('<str:symbol>/',us_stockdaily_view),
     path('<str:symbol>/incomestatement/',incomeStatement_view),
     path('<str:symbol>/balancesheet/',balanceSheet_view),

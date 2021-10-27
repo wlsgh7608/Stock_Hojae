@@ -10,10 +10,11 @@ class UsStocklist(models.Model):
     name = models.CharField(max_length=100)
     industry = models.CharField(max_length=50)
     industry_id = models.IntegerField()
-
     class Meta:
         managed = False
         db_table = 'us_stocklist'
+
+
 
 class UsCompanyDaily(models.Model):
     id = models.AutoField(primary_key=True,auto_created=True)
@@ -28,8 +29,6 @@ class UsCompanyDaily(models.Model):
     class Meta:
         unique_together =(('company_code','stock_date'),)
         ordering = ['-stock_date']
-
-
 
 class IncomeStatement(models.Model):
     id = models.AutoField(primary_key=True,auto_created=True)

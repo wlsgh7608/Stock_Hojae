@@ -1,4 +1,3 @@
-import enum
 import FinanceDataReader as fdr
 import psycopg2
 import pandas as pd
@@ -8,11 +7,12 @@ from crud import CRUD
 from databases import Databases
 from time import sleep
 import yahoo_fin.stock_info as si
-
+import requests
+from bs4 import BeautifulSoup
 
 CURRENCY_LIST = {
     'KRW':fdr.DataReader('KRW/USD','today')['Close'],
-    'JPY':fdr.DataReader('JPY/USD','today')['Close']*0.01, #환율값 오류인듯
+    'JPY':fdr.DataReader('JPY/USD','today')['Close']*0.01, #환율값 오류
     'CNY':fdr.DataReader('CNY/USD','today')['Close'],
     'EUR':fdr.DataReader('EUR/USD','today')['Close'],
     'TWD':fdr.DataReader('TWD/USD','today')['Close']
@@ -148,7 +148,47 @@ def create_us_incomestatement():
                 print(data)
                 db.insertDB(schema='public',table='incomestatement',column=column,data=data)
         sleep(2)
-        
+def get_companylist():
+    """
+    기업리스트 출력
+    """
+    database = Databases()
+    sql = "SELECT DISTINCT symbol FROM us_stocklist" #db에 저장된 기업리스트
+    curs = database.cursor
+    curs.execute(sql) 
+    db_stock_list = [item[0] for item in curs.fetchall()] # 기업 symbol리스트
+    return db_stock_list
+
+
+def company_description():
+    """
+    기업 설명
+    """
+    df = get_companylist()
+    print(df)
+
+    for i,ticker in enumerate(df):
+        print(i,ticker)
+        url = "http://m.stock.naver.com/index.html#/worldstock/stock/"+ticker+".O/overview"
+        if '.' in ticker:
+            print("yes",ticker)
+            a,b = ticker.split('.')
+            b = b.lower()
+            print(a,b)
+            ticker = a+b
+            url = "http://m.stock.naver.com/index.html#/worldstock/stock/"+ticker+"/overview"
+        print(url)
+        header = {'User-Agent' : 'Mozilla/5.0'}
+        webpage = requests.get(url,headers=header)
+        soup = BeautifulSoup(webpage.content, "html.parser")
+        content = soup.select('#content > div.OverviewContainer_overviewContainer__2Gzn5 > div.OverviewContainer_infoCorp__3K5qX > p.OverviewContainer_desc__unQ18')
+        print(soup)
+
+        sleep(2)
+
+    
+    
+
 def create_us_balancesheet():
     """
     기업 대차대조표
@@ -198,6 +238,27 @@ def create_us_balancesheet():
                     db.insertDB(schema='public',table='balancesheet',column=column,data=data)
             sleep(2)
     
+def news_us():
+    ticker = 'MSFT'
+    url = "https://www.stockwatch.com/Quote/Detail?U:" + ticker
+    print("urL",url)
+    source_code = requests.get(url).text
+    html = BeautifulSoup(source_code,'lxml')
+    print(source_code)
+
+    
+    # links = html.select('#MainContent_NewsList1_Table1_Table1 > tbody')
+    #news link
+    # print(links)
+    # news_list = links.find_all('a')
+    # link_list = []
+    # for i,news in enumerate(news_list):
+    #     if i%2 ==1:
+    #          link = news.attrs['href']
+    #          news_link = 'https://www.stockwatch.com/'+link
+    #          print(news_link)
+    #          link_list.append(news_link)
+    # return link_list
 
 
 if __name__ == '__main__':
@@ -205,5 +266,6 @@ if __name__ == '__main__':
     # create_table_us_stockinfo()
     # create_us_stocklist()
     # create_us_stockinfo()
-    create_us_balancesheet()
-    
+    # create_us_balancesheet()
+    # company_description()
+    news_us()

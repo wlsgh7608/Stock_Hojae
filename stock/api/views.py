@@ -3,15 +3,24 @@ from stock import serializers
 from ..serializers import BalanceSheetSerializer, UsStockDailySerializer, UsStockListSerializer,IncomeStatementSerializer
 from ..models import BalanceSheet, UsStocklist,UsCompanyDaily,IncomeStatement
 from rest_framework.response import Response
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view,permission_classes,authentication_classes
+from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework_jwt.authentication import JSONWebTokenAuthentication
 from rest_framework.generics import ListAPIView
 from rest_framework.filters import SearchFilter,OrderingFilter
+from rest_framework.permissions import AllowAny,IsAuthenticated
 
 
+
+# @api_view(['GET'])
+# @permission_classes((IsAuthenticated, ))
+# @authentication_classes((JSONWebTokenAuthentication,))
 class StocklistView(ListAPIView):
     """
     미국주식 리스트 출력
     """
+    permission_classes = [AllowAny,]
+    authentication_classes = [JSONWebTokenAuthentication,]
     queryset = UsStocklist.objects.all()
     serializer_class = UsStockListSerializer
     filter_backends = (SearchFilter,)
@@ -19,6 +28,8 @@ class StocklistView(ListAPIView):
 
 
 # @api_view(['GET'])
+# @permission_classes((AllowAny, ))
+# @authentication_classes((JSONWebTokenAuthentication,))
 # def us_stocklist_view(request,*args,**kwargs):
 #     stocklist = UsStocklist.objects.all()
 #     serializer = UsStockListSerializer(stocklist,many = True)
@@ -26,6 +37,8 @@ class StocklistView(ListAPIView):
     
 
 @api_view(['GET'])
+# @permission_classes((IsAuthenticated, ))
+# @authentication_classes((JSONWebTokenAuthentication,))
 def us_stockdaily_view(request,symbol,*args,**kwargs):
     """
     주식 일일데이터 출력
