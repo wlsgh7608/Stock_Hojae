@@ -1,11 +1,11 @@
 from django.contrib import admin
-from .models import Question,Answer
+from .models import Blog, Comment
 # Register your models here.
 
-class QuestionAdmin(admin.ModelAdmin):
-    search_fields= ['subject']
+class BlogAdmin(admin.ModelAdmin):
+    search_fields= ['title']
 
-admin.site.register(Question)
-admin.site.register(Answer)
+admin.site.register(Blog)
+admin.site.register(Comment)
 
 
