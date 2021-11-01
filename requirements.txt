@@ -7,6 +7,8 @@ charset-normalizer==2.0.6
 colorama==0.4.4
 cssselect==1.1.0
 Django==3.2.8
+django-cors-headers==3.10.0
+django-filter==21.1
 django-rest-authtoken==2.1.4
 djangorestframework==3.12.4
 djangorestframework-jwt==1.11.0

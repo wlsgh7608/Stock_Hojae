@@ -13,7 +13,7 @@ class LoginConfirm:
 
     def __call__(self,request,*args,**kwargs):
         token = request.headers.get("Authorization",None)
-        token = token[4:]
+        token = token[4:] # jwt 토큰만 가져오기
         try:
             if token:
                 token_payload = jwt.decode(jwt = token,key =SECRET_KEY,algorithms='HS256')
@@ -22,7 +22,7 @@ class LoginConfirm:
                 request.user = user
                 return self.og_function(self,request,*args,**kwargs)
             return JsonResponse({'message':"로그인이 필요합니다."},status = 401)
-            
+
         except jwt.ExpiredSignatureError:
             return JsonResponse({'message':"토큰이 만료되었습니다."},status = 401)
         except jwt.DecodeError:

@@ -267,5 +267,5 @@ if __name__ == '__main__':
     # create_us_stocklist()
     # create_us_stockinfo()
     # create_us_balancesheet()
-    # company_description()
-    news_us()
+    company_description()
+    # news_us()

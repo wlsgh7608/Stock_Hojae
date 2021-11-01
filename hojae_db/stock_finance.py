@@ -6,8 +6,6 @@ from crud import CRUD
 from databases import Databases
 from time import sleep
 import FinanceDataReader as fdr
-
-
 import requests
 import pandas as pd
 import ftplib
@@ -23,6 +21,7 @@ CURRENCY_LIST = {
     'EUR':fdr.DataReader('EUR/USD','today')['Close'],
     'TWD':fdr.DataReader('TWD/USD','today')['Close']
     }
+
 def get_today_currency(currency):
     """ 환율 계산"""
     if currency == 'USD':
@@ -53,9 +52,4 @@ print('multiple : ',multiple)
 df =df.mul(multiple).transpose()
 
 print(df)
-
-
-
-
-
 # print(AAPL.shape)

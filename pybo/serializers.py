@@ -19,7 +19,7 @@ class BlogSerializer(serializers.ModelSerializer):
     user = PublicProfileSerializer(source='user.profile', read_only=True)
     class Meta:
         model = Blog
-        fields = ['symbol','id','title','create_date','user','body','modify_date']
+        fields = ['user','symbol','id','title','create_date','body','modify_date']
 
     def validate_content(self, value):
         if len(value) > 500:

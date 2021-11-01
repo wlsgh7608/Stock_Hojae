@@ -1,11 +1,13 @@
+from django.contrib.auth import get_user_model
 from django.http.response import HttpResponse
 from django.shortcuts import render,get_object_or_404
+from rest_framework import permissions
 
-from pybo.serializers import BlogSerializer
+from pybo.serializers import BlogSerializer,PublicProfileSerializer
 from .models import Blog,Comment
 from rest_framework import serializers, viewsets
 # Create your views here.
-from rest_framework.permissions import AllowAny, IsAuthenticatedOrReadOnly
+from rest_framework.permissions import AllowAny, IsAuthenticated, IsAuthenticatedOrReadOnly
 from core.utils import LoginConfirm
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view
@@ -33,12 +35,54 @@ class BlogList(APIView):
         if serializer.is_valid(): #유효성 검사
             if symbol: # symbol 객체가 존재할 시 
                 serializer.save(user = request.user,symbol = symbol) # 저장
-                print("serializer adsfasfasdf asd : ",serializer.data)
                 return Response(serializer.data, status=201)
             else:
                 return Response({"messsage":"symbol does not exist"},status=400)
-
         return Response(serializer.errors, status=400)
+
+
+
+class BlogDetailView(APIView):
+    permissions = [IsAuthenticatedOrReadOnly] # 인증된 사람만
+
+
+    def get(self,request,symbol,blog_id,*args,**kwargs):
+        blogs = Blog.objects.filter(symbol=symbol)
+        blog = blogs.get(pk = blog_id)
+        serializers = BlogSerializer(blog)
+        return Response(serializers.data)
+
+    @LoginConfirm
+    def put(self,request,symbol,blog_id,*args,**kwargs):
+        blogs = Blog.objects.filter(symbol=symbol)
+        blog = blogs.get(pk = blog_id)
+        serializer = BlogSerializer(data = request.data , instance = blog)
+        if blog.user != request.user:
+            print("유저 다름")
+            return Response({"message": "사용자가 다릅니다. "},status = 400)
+        if serializer.is_valid(): #유효성 검사
+            serializer.save() # 저장
+            return Response(serializer.data, status=201) # Update 성공
+        else:
+            return Response({"messsage":"symbol does not exist"},status=400)
+
+
+
+
+
+    def post(self,request,symbol,blog_id,*args,**kwargs):
+        pass    
+        
+
+
+User = get_user_model()
+class UserList(APIView):
+    permission_classes = [AllowAny] 
+    # User list를 보여줄 때
+    def get(self,*args,**kwargs):
+        Users = User.objects.all()
+        serializer = PublicProfileSerializer(Users, many=True)
+        return Response(serializer.data)
 
 
 
