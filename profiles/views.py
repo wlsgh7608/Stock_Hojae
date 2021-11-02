@@ -34,3 +34,11 @@ class Check(APIView):
         context = {'message':"success",'data':serializer.data}
         return Response(context)
         
+class UserList(APIView):
+    permission_classes = [AllowAny] 
+    # User list를 보여줄 때
+    def get(self,*args,**kwargs):
+        Users = User.objects.all()
+        print(Users)
+        serializer = UserSerializer(Users, many=True)
+        return Response(serializer.data)

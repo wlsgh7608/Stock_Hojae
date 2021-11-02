@@ -4,6 +4,7 @@ from django.shortcuts import render,get_object_or_404
 from rest_framework import permissions
 
 from pybo.serializers import BlogSerializer,PublicProfileSerializer
+from profiles.serializers import UserSerializer
 from .models import Blog,Comment
 from rest_framework import serializers, viewsets
 # Create your views here.
@@ -14,6 +15,19 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from stock.models import UsStocklist
 
+from django.utils import timezone
+
+User = get_user_model()
+class UserList(APIView):
+    permission_classes = [AllowAny] 
+    # User list를 보여줄 때
+    def get(self,*args,**kwargs):
+        Users = User.objects.all()
+        print(Users)
+        serializer = UserSerializer(Users, many=True)
+        return Response(serializer.data)
+
+        
 class BlogList(APIView):
     permission_classes = [IsAuthenticatedOrReadOnly] # 인증받은사람이 아니면 읽기만 가능
 
@@ -52,6 +66,7 @@ class BlogDetailView(APIView):
         serializers = BlogSerializer(blog)
         return Response(serializers.data)
 
+    #Update
     @LoginConfirm
     def put(self,request,symbol,blog_id,*args,**kwargs):
         blogs = Blog.objects.filter(symbol=symbol)
@@ -61,57 +76,22 @@ class BlogDetailView(APIView):
             print("유저 다름")
             return Response({"message": "사용자가 다릅니다. "},status = 400)
         if serializer.is_valid(): #유효성 검사
-            serializer.save() # 저장
+            print(timezone.now())
+            serializer.save(modify_date = timezone.now()) # 저장
             return Response(serializer.data, status=201) # Update 성공
         else:
             return Response({"messsage":"symbol does not exist"},status=400)
-
-
-
-
-
-    def post(self,request,symbol,blog_id,*args,**kwargs):
-        pass    
-        
-
-
-User = get_user_model()
-class UserList(APIView):
-    permission_classes = [AllowAny] 
-    # User list를 보여줄 때
-    def get(self,*args,**kwargs):
-        Users = User.objects.all()
-        serializer = PublicProfileSerializer(Users, many=True)
-        return Response(serializer.data)
-
-
-
-@api_view(['GET'])
-def blog_list_view(request,symbol,*args,**kwargs):
-    serializer = BlogSerializer
-
-
-
-@api_view(['GET'])
-def blog_detail_view(request,symbol,pk,*args,**kwargs):
-    print(symbol,pk)
-    print(args,kwargs)
-    
-    serializer = BlogSerializer
-
-
-
-def index(request):
-    """
-    pybo 목록 출력
-    """
-    question_list = Blog.objects.order_by('-create_date')
-    context = {'question_list':question_list}
-    return render(request,'pybo/question_list.html',context)
-def detail(request,question_id):
-    """
-    pybo 목록 출력
-    """
-    question = get_object_or_404(Blog,pk = question_id)
-    context = {'question':question}
-    return render(request,'pybo/question_detail.html',context)
+    #Delete
+    @LoginConfirm
+    def delete(self,request,symbol,blog_id,*args,**kwargs):
+        blog = Blog.objects.get(pk=blog_id) or None
+        serializer = BlogSerializer(request.data,instance=blog)
+        if blog:
+            if blog.user != request.user:
+                print("different user!")
+                return Response({"message":"사용자가 다릅니다."},status= 400)
+            else:
+                blog.delete()
+                return Response({"message":"blog delete success"})
+        else:
+            return Response({"message":"blog does not exist"},status = 404)

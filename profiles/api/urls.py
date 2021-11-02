@@ -1,7 +1,7 @@
 from django.urls import path
 from rest_framework_jwt.views import obtain_jwt_token,refresh_jwt_token,verify_jwt_token
 
-from ..views import CreateUserView,Check
+from ..views import CreateUserView,Check,UserList
 
 
 """
@@ -16,4 +16,5 @@ urlpatterns = [
 
     path('refresh/',refresh_jwt_token), # jwt 토큰 갱신
     path('verify/',verify_jwt_token), # jwt 토큰 확인
+    path('userlist/',UserList.as_view())
 ] 

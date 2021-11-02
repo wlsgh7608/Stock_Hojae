@@ -2,24 +2,28 @@ from .models import Blog
 
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
+from django.conf import settings
+
+from profiles.serializers import UserSerializer
+
 
 User = get_user_model()
 class PublicProfileSerializer(serializers.ModelSerializer):
-    username = serializers.SerializerMethodField(read_only = True)
+    # username = serializers.SerializerMethodField(read_only = True)
 
-    class Meta:
+     class Meta:
         model = User
-        fields =[
-            'username',
-            'id',
-        ] 
+        # fields = ( "id", "username" )
+        fields = '__all__'
+
+
 
 
 class BlogSerializer(serializers.ModelSerializer):
-    user = PublicProfileSerializer(source='user.profile', read_only=True)
+    user = serializers.ReadOnlyField(source = 'user.username')
     class Meta:
         model = Blog
-        fields = ['user','symbol','id','title','create_date','body','modify_date']
+        fields = '__all__'
 
     def validate_content(self, value):
         if len(value) > 500:
