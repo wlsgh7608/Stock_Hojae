@@ -44,7 +44,6 @@ class UserList(APIView):
     def get(self,request,*args,**kwargs):
         check_username = request.data['username']
         Users = User.objects.filter(username = check_username)
-        print("users",Users)
         if Users:
             return Response({"message":"already exists"},status=400)
         else:

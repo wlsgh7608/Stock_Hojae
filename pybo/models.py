@@ -11,6 +11,7 @@ class Blog(models.Model):
     user = models.ForeignKey(User,related_name ='blogs', on_delete=models.CASCADE)
     create_date = models.DateTimeField(auto_now_add=True)
     modify_date= models.DateTimeField(null = True, blank = True)
+    hits = models.IntegerField(default = 0)
 
     def __str__(self):
         return self.title

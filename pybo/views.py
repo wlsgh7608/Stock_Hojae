@@ -75,6 +75,8 @@ class BlogDetailView(APIView):
     def get(self,request,symbol,blog_id,*args,**kwargs):
         blogs = Blog.objects.filter(symbol=symbol)
         blog = blogs.get(pk = blog_id)
+        blog.hits +=1
+        blog.save()
         serializers = BlogSerializer(blog)
         return Response(serializers.data)
 
@@ -95,9 +97,8 @@ class BlogDetailView(APIView):
             return Response({"messsage":"symbol does not exist"},status=400)
     #Delete
     @LoginConfirm
-    def delete(self,request,symbol,blog_id,*args,**kwargs):
+    def delete(self,request,blog_id,*args,**kwargs):
         blog = Blog.objects.get(pk=blog_id) or None
-        serializer = BlogSerializer(request.data,instance=blog)
         if blog:
             if blog.user != request.user:
                 print("different user!")
