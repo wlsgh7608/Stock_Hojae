@@ -18,7 +18,6 @@ class LoginConfirm:
             if token:
                 token_payload = jwt.decode(jwt = token,key =SECRET_KEY,algorithms='HS256')
                 user = User.objects.get(username = token_payload['username'])
-                print("user is ", token_payload)
                 request.user = user
                 return self.og_function(self,request,*args,**kwargs)
             return JsonResponse({'message':"로그인이 필요합니다."},status = 401)

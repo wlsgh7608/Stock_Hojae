@@ -116,7 +116,7 @@ class CommentView(APIView):
 
     # Read
     def get(self,request,symbol,blog_id,*args,**kwargs):
-        comments = Comment.objects.filter(symbol=symbol)
+        comments = Comment.objects.filter(blog_id=blog_id)
         blog = comments.get(pk = blog_id)
         serializers = CommentSerializer(blog,many = True)
         return Response(serializers.data)
