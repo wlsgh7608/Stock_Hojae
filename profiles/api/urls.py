@@ -16,5 +16,5 @@ urlpatterns = [
 
     path('refresh/',refresh_jwt_token), # jwt 토큰 갱신
     path('verify/',verify_jwt_token), # jwt 토큰 확인
-    path('userlist/',UserList.as_view())
+    path('usercheck/',UserList.as_view())
 ] 

@@ -2,8 +2,9 @@ from django.contrib.auth import get_user_model
 from django.http.response import HttpResponse
 from django.shortcuts import render,get_object_or_404
 from rest_framework import permissions
+from rest_framework.fields import ReadOnlyField
 
-from pybo.serializers import BlogSerializer,PublicProfileSerializer
+from pybo.serializers import BlogSerializer, CommentSerializer,PublicProfileSerializer
 from profiles.serializers import UserSerializer
 from .models import Blog,Comment
 from rest_framework import serializers, viewsets
@@ -19,12 +20,23 @@ from django.utils import timezone
 
 User = get_user_model()
 class UserList(APIView):
-    permission_classes = [AllowAny] 
+    permission_classes = [AllowAny]
+    
     # User list를 보여줄 때
     def get(self,*args,**kwargs):
         Users = User.objects.all()
         print(Users)
         serializer = UserSerializer(Users, many=True)
+        return Response(serializer.data)
+
+
+class BlogEntireList(APIView):
+    permissions_classes = [IsAuthenticatedOrReadOnly]
+
+    def get(self,request,*args,**kwargs):
+        blogs = Blog.objects.all()
+        blogs = blogs.order_by('-create_date')
+        serializer = BlogSerializer(blogs,many = True)
         return Response(serializer.data)
 
         
@@ -89,9 +101,71 @@ class BlogDetailView(APIView):
         if blog:
             if blog.user != request.user:
                 print("different user!")
-                return Response({"message":"사용자가 다릅니다."},status= 400)
+                return Response({"message":"different user!"},status= 400)
             else:
                 blog.delete()
                 return Response({"message":"blog delete success"})
         else:
             return Response({"message":"blog does not exist"},status = 404)
+
+
+class CommentView(APIView):
+    permissions = [IsAuthenticatedOrReadOnly]
+
+
+    # Read
+    def get(self,request,symbol,blog_id,*args,**kwargs):
+        comments = Comment.objects.filter(symbol=symbol)
+        blog = comments.get(pk = blog_id)
+        serializers = CommentSerializer(blog,many = True)
+        return Response(serializers.data)
+
+    # Create
+    @LoginConfirm
+    def post(self,request,symbol,comment_id,*args,**kwargs):
+        # request.data는 사용자의 입력 데이터
+        symbol = UsStocklist.objects.get(symbol = symbol) or None # symbol 확인
+        blog_id = Blog
+        serializer = BlogSerializer(data=request.data)
+        if serializer.is_valid(): #유효성 검사
+            if symbol: # symbol 객체가 존재할 시 
+                serializer.save(user = request.user,symbol = symbol) # 저장
+                return Response(serializer.data, status=201)
+            else:
+                return Response({"messsage":"symbol does not exist"},status=400)
+        return Response(serializer.errors, status=400)
+
+
+    # Update
+    @LoginConfirm
+    def put(self,request,symbol,comment_id,*args,**kwargs):
+        blog = Blog.objects.get(pk=comment_id) or None
+        serializer = BlogSerializer(request.data,instance=blog)
+        if blog:
+            if blog.user != request.user:
+                print("different user!")
+                return Response({"message":"different user!"},status= 400)
+            else:
+                blog.delete()
+                return Response({"message":"blog delete success"})
+        else:
+            return Response({"message":"blog does not exist"},status = 404)
+
+
+    # Delete
+    @LoginConfirm
+    def delete(self,request,symbol,comment_id,*args,**kwargs):
+        blog = Blog.objects.get(pk=comment_id) or None
+        serializer = BlogSerializer(request.data,instance=blog)
+        if blog:
+            if blog.user != request.user:
+                print("different user!")
+                return Response({"message":"different user!"},status= 400)
+            else:
+                blog.delete()
+                return Response({"message":"blog delete success"})
+        else:
+            return Response({"message":"blog does not exist"},status = 404)
+
+
+    

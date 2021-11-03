@@ -4,6 +4,7 @@ import jwt
 
 # Create your views here.
 from rest_framework import permissions
+from rest_framework.fields import ReadOnlyField
 from rest_framework.generics import CreateAPIView
 from rest_framework.views import APIView
 from django.contrib.auth import get_user_model
@@ -37,8 +38,11 @@ class Check(APIView):
 class UserList(APIView):
     permission_classes = [AllowAny] 
     # User list를 보여줄 때
-    def get(self,*args,**kwargs):
-        Users = User.objects.all()
-        print(Users)
-        serializer = UserSerializer(Users, many=True)
-        return Response(serializer.data)
+    def get(self,request,*args,**kwargs):
+        check_username = request.data['username']
+        Users = User.objects.filter(username = check_username)
+        print("users",Users)
+        if Users:
+            return Response({"message":"already exists"},status=400)
+        else:
+            return Response({"message":"available username"},status = 200)

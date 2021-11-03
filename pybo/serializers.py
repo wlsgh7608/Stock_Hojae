@@ -1,4 +1,4 @@
-from .models import Blog
+from .models import Blog,Comment
 
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
@@ -25,12 +25,22 @@ class BlogSerializer(serializers.ModelSerializer):
         model = Blog
         fields = '__all__'
 
-    def validate_content(self, value):
-        if len(value) > 500:
+    def validate_content(self, body):
+        if len(body) > 500:
             raise serializers.ValidationError("내용이 너무 깁니다.(500자)")
-        return value
+        return body
 
 
+class CommentSerializer(serializers.ModelSerializer):
+    user = serializers.ReadOnlyField(source = 'user.username')
 
+    class Meta:
+        model = Comment
+        fields = '__all__'
+
+    def validate_content(self, content):
+        if len(content) > 500:
+            raise serializers.ValidationError("내용이 너무 깁니다.(500자)")
+        return content
 
    
