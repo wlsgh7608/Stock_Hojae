@@ -12,6 +12,7 @@ class Blog(models.Model):
     create_date = models.DateTimeField(auto_now_add=True)
     modify_date= models.DateTimeField(null = True, blank = True)
     hits = models.IntegerField(default = 0)
+    # comment_number = models.IntegerField(default = 0)
 
     def __str__(self):
         return self.title

@@ -76,12 +76,14 @@ class BlogDetailView(APIView):
 
     def get(self,request,symbol,blog_id,*args,**kwargs):
         blogs = Blog.objects.filter(symbol=symbol)
-        blog = blogs.get(pk = blog_id)
-        print(blog)
-        blog.hits +=1
-        blog.save()
-        serializers = BlogSerializer(blog)
-        return Response(serializers.data)
+        blog = blogs.get(pk = blog_id) or None
+        if blog:
+            blog.hits +=1
+            blog.save()
+            serializers = BlogSerializer(blog)
+            return Response(serializers.data)
+        else:
+            return Response({"message":'comment does not exist'},status = 404)
 
     #Update
     @LoginConfirm
@@ -131,6 +133,7 @@ class CommentListView(APIView):
             serializer = CommentSerializer(data = request.data)
             if serializer.is_valid(): #유효성 검사
                 serializer.save(user = request.user,question = blog) # 저장
+                blog.comment_number 
                 return Response(serializer.data, status=201)
         else:
             return Response({"message":"blog does not exist"},status = 404)
@@ -140,7 +143,9 @@ class CommentDetailView(APIView):
     permissions = [IsAuthenticatedOrReadOnly]
     # Read
     def get(self,request,comment_id,*args,**kwargs):
-        comments = Comment.objects.get(pk=comment_id)
+        
+        # comments = Comment.objects.get(pk=comment_id)
+        comments = get_object_or_404(Comment,pk = comment_id)
         if comments:
             serializers = CommentSerializer(comments)
             return Response(serializers.data)
@@ -151,7 +156,6 @@ class CommentDetailView(APIView):
     @LoginConfirm
     def put(self,request,comment_id,*args,**kwargs):
         comment = Comment.objects.get(pk=comment_id) or None
-        print(comment)
         serializer = CommentSerializer(data = request.data,instance=comment)
         if comment:
             if comment.user != request.user:

@@ -21,15 +21,21 @@ class PublicProfileSerializer(serializers.ModelSerializer):
 
 class BlogSerializer(serializers.ModelSerializer):
     user = serializers.ReadOnlyField(source = 'user.username')
+    comments_number = serializers.SerializerMethodField()
+
     class Meta:
         model = Blog
         fields = '__all__'
+
+    def get_comments_number(self,obj):
+        return obj.comment_set.count()
 
     
     def validate_body(self, body): 
         if len(body) > 500:
             raise serializers.ValidationError("내용이 너무 깁니다.(500자)")
         return body
+        
 
 
 class CommentSerializer(serializers.ModelSerializer):
