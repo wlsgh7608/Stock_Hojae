@@ -26,6 +26,7 @@ class BlogSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     def validate_content(self, body):
+        
         if len(body) > 500:
             raise serializers.ValidationError("내용이 너무 깁니다.(500자)")
         return body
