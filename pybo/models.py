@@ -18,8 +18,7 @@ class Blog(models.Model):
 
 
 class Comment(models.Model):
-    symbol = models.ForeignKey(UsStocklist,on_delete= models.CASCADE,null= False,default ='')
-    question = models.ForeignKey(Blog,on_delete=models.CASCADE)
+    question = models.ForeignKey(Blog,on_delete=models.CASCADE,default= '')
     content = models.TextField()
     user = models.ForeignKey(User,related_name ='comments', on_delete=models.CASCADE)
     create_date = models.DateTimeField(auto_now_add=True)
