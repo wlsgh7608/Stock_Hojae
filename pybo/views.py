@@ -160,7 +160,6 @@ class CommentView(APIView):
         serializer = BlogSerializer(request.data,instance=blog)
         if blog:
             if blog.user != request.user:
-                print("different user!")
                 return Response({"message":"different user!"},status= 400)
             else:
                 blog.delete()
