@@ -36,6 +36,9 @@ class Check(APIView):
         return Response(context)
         
 class UserList(APIView):
+    """
+    유저이름 중복확인
+    """
     permission_classes = [AllowAny] 
     # User list를 보여줄 때
     def get(self,request,*args,**kwargs):
