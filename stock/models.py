@@ -2,8 +2,12 @@ from enum import unique
 from django.db import models
 from django.db.models.deletion import CASCADE
 from django.db.models.fields import BigIntegerField, IntegerField
+from django.contrib.auth import get_user, get_user_model
+
 
 # Create your models here.
+User = get_user_model()
+
 
 class UsStocklist(models.Model):
     symbol = models.CharField(primary_key=True, max_length=20)
@@ -67,6 +71,13 @@ class notapply(models.Model):
     anb = models.IntegerField()
     pub_date = models.DateField()
 
+class portfolio(models.Model):
+    user = models.ForeignKey(User,on_delete=CASCADE)
+    symbol = models.ForeignKey(UsStocklist,on_delete=CASCADE)
+
+
+    class Meta:
+        db_table = 'portfolio'
 
 class Company(models.Model):
     code = models.CharField(max_length=20)

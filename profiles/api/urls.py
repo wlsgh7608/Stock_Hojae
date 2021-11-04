@@ -1,8 +1,7 @@
 from django.urls import path
 from rest_framework_jwt.views import obtain_jwt_token,refresh_jwt_token,verify_jwt_token
 
-from ..views import CreateUserView,Check,UserList
-
+from ..views import CreateUserView,Check, TodoDetail,UserList,TodoListView
 
 """
 CLIENT
@@ -16,5 +15,7 @@ urlpatterns = [
 
     path('refresh/',refresh_jwt_token), # jwt 토큰 갱신
     path('verify/',verify_jwt_token), # jwt 토큰 확인
-    path('usercheck/',UserList.as_view())
+    path('usercheck/',UserList.as_view()), 
+    path('todolist/',TodoListView.as_view()), # 유저별 todolist
+    path('todo/<int:todo_id>/',TodoDetail.as_view()), # todolist 상세
 ] 

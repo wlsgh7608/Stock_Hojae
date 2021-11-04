@@ -60,7 +60,7 @@ INSTALLED_APPS = [
     'pybo',
     'stock',
     'django_filters',
-    # 'profiles',
+    'profiles',
     
     #third
     'rest_framework',

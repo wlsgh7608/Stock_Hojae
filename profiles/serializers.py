@@ -1,6 +1,8 @@
 from rest_framework import serializers
 from rest_framework_jwt.settings import api_settings
 from django.contrib.auth import get_user_model
+
+from profiles.models import TodoList
 # from .models import User
 
 User = get_user_model()
@@ -26,8 +28,16 @@ class UserSerializer(serializers.ModelSerializer):
         # Tuple of serialized model fields (see link [2])
         fields = ( "id", "username", "password","password2" )
 
-class UserLoginSerializer(serializers.ModelSerializer):
-    pass
+class TodolistSerializer(serializers.ModelSerializer):
+
+    def validate_todolist(self,todolist):
+        if len(todolist)>50:
+            raise serializers.ValidationError({"todolist":"todolist가 너무 깁니다."})
+        return todolist
+
+    class Meta:
+        model = TodoList
+        fields = ('id','todolist')
 
 
 
