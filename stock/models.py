@@ -71,13 +71,7 @@ class notapply(models.Model):
     anb = models.IntegerField()
     pub_date = models.DateField()
 
-class portfolio(models.Model):
-    user = models.ForeignKey(User,on_delete=CASCADE)
-    symbol = models.ForeignKey(UsStocklist,on_delete=CASCADE)
 
-
-    class Meta:
-        db_table = 'portfolio'
 
 class Company(models.Model):
     code = models.CharField(max_length=20)

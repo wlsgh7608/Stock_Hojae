@@ -102,7 +102,7 @@ class TodoDetail(APIView):
         todo = TodoList.objects.get(pk = todo_id)
         if todo:
             if todo.user!= request.user:
-                return Response({"message":"different user!"},stauts=  400)
+                return Response({"message":"different user!"},status=  400)
             todo.delete()
             return Response({"message":"todo deleted"})
         return Response({"message":"todo does not exist"},status = 404)
