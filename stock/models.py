@@ -15,15 +15,14 @@ class UsStocklist(models.Model):
     industry = models.CharField(max_length=50)
     industry_id = models.IntegerField()
     class Meta:
-        managed = False
-        db_table = 'us_stocklist'
+        db_table = 'usstocklist'
 
 
 
 class UsCompanyDaily(models.Model):
     id = models.AutoField(primary_key=True,auto_created=True)
     stock_date = models.DateField()
-    company_code = models.ForeignKey(UsStocklist,on_delete=CASCADE)
+    company_code = models.ForeignKey(UsStocklist,on_delete=CASCADE,db_column='symbol')
     close = models.FloatField(blank = True, null = True)
     open = models.FloatField(blank = True, null = True)
     high = models.FloatField(blank = True, null = True)
@@ -36,7 +35,7 @@ class UsCompanyDaily(models.Model):
 
 class IncomeStatement(models.Model):
     id = models.AutoField(primary_key=True,auto_created=True)
-    company_code = models.ForeignKey(UsStocklist,on_delete=CASCADE, null= False,default ='')
+    company_code = models.ForeignKey(UsStocklist,on_delete=CASCADE, null= False,default ='',db_column='symbol')
     end_date = models.DateField() # 날짜
     revenue = models.IntegerField(default=0,null=True) # 매출
     gross_profit = models.IntegerField(default =0,null=True) # 매출총이익 = 매출 - 매출원가
@@ -51,7 +50,7 @@ class IncomeStatement(models.Model):
 
 class BalanceSheet(models.Model):
     id = models.AutoField(primary_key=True,auto_created=True)
-    company_code = models.ForeignKey(UsStocklist,on_delete=CASCADE, null= False,default ='')
+    company_code = models.ForeignKey(UsStocklist,on_delete=CASCADE, null= False,default ='',db_column='symbol')
     end_date = models.DateField()# 날짜
     
     total_liability = BigIntegerField(default=0,null=True) # 총부채비용
@@ -66,17 +65,3 @@ class BalanceSheet(models.Model):
         ordering = ['-end_date']
 
 
-class notapply(models.Model):
-    id = models.AutoField(primary_key=True,auto_created=True)
-    anb = models.IntegerField()
-    pub_date = models.DateField()
-
-
-
-class Company(models.Model):
-    code = models.CharField(max_length=20)
-    name = models.CharField(max_length=40)
-    last_update = models.DateField()
-
-    def __str__(self):
-        return self.company
