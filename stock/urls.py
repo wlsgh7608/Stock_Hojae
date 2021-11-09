@@ -1,8 +1,9 @@
 from django.urls import path
-from . import views
+from .views import individual_stock_update,entire_stock_update
 app_name = 'stock'
 
 
 urlpatterns = [
-    path('',views.index,name = 'index')
+    path('',entire_stock_update),
+    path('list/<str:symbol>/',individual_stock_update)
 ]

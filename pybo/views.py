@@ -133,11 +133,11 @@ class CommentListView(APIView):
             serializer = CommentSerializer(data = request.data)
             if serializer.is_valid(): #유효성 검사
                 serializer.save(user = request.user,question = blog) # 저장
-                blog.comment_number 
+                # blog.comment_number 
                 return Response(serializer.data, status=201)
-        else:
-            return Response({"message":"blog does not exist"},status = 404)
-        return Response(serializer.errors, status=400)
+            else:
+                return Response(serializer.errors, status=400)
+        return Response({"message":"blog does not exist"},status = 404)
 
 class CommentDetailView(APIView):
     permissions = [IsAuthenticatedOrReadOnly]

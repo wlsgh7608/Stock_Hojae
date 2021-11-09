@@ -25,5 +25,6 @@ urlpatterns = [
     path('api/stock/',include('stock.api.urls')),
     path('users/',include('profiles.api.urls')),
     path('boards/',include('pybo.api.urls')),
+    path('portfolio/',include('portfolio.urls')),
 
 ]

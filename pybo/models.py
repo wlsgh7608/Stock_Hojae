@@ -5,7 +5,7 @@ from stock.models import UsStocklist
 
 User = get_user_model()
 class Blog(models.Model):
-    symbol = models.ForeignKey(UsStocklist,on_delete= models.CASCADE,null= False,default ='',db_column='symbol')
+    symbol = models.ForeignKey(UsStocklist,on_delete= models.CASCADE,null= False,default ='')
     title = models.CharField(max_length=50)
     body = models.TextField()
     user = models.ForeignKey(User,related_name ='blogs', on_delete=models.CASCADE)

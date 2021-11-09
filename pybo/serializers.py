@@ -43,7 +43,7 @@ class CommentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Comment
-        fields = '__all__'
+        fields = ('id','content','user','create_date','modify_date')
 
     def validate_content(self, content):  
         if len(content) > 500:

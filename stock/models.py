@@ -65,3 +65,20 @@ class BalanceSheet(models.Model):
         ordering = ['-end_date']
 
 
+class CurrentStock(models.Model):
+    """
+    수익률 비교 model
+    """
+    symbol = models.OneToOneField(UsStocklist,on_delete=models.CASCADE)
+    close = models.FloatField(blank = True, null = True)
+    open = models.FloatField(blank = True, null = True)
+    high = models.FloatField(blank = True, null = True)
+    low = models.FloatField(blank = True, null = True)
+    volume = models.IntegerField(blank = True, null = True)
+    change = models.FloatField(blank = True, null = True)
+    date = models.DateField(null = True)
+
+    class Meta:
+        db_table = 'currentstock'
+    
+

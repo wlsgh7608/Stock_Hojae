@@ -61,6 +61,7 @@ INSTALLED_APPS = [
     'stock',
     'django_filters',
     'profiles',
+    'portfolio',
     
     #third
     'rest_framework',
