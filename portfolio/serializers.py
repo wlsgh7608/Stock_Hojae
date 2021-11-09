@@ -6,7 +6,7 @@ from stock.models import CurrentStock
 
 
 class PortfolioNameSerializer(serializers.ModelSerializer):
-    username = serializers.ReadOnlyField(source = 'user.username')
+    user = serializers.ReadOnlyField(source = 'user.username')
     class Meta:
         model =  PortfolioName
         # fields = ('username','name')
@@ -14,6 +14,7 @@ class PortfolioNameSerializer(serializers.ModelSerializer):
 
 
 class PortfolioSerializer(serializers.ModelSerializer):
+    user = serializers.ReadOnlyField(source = 'user.username')
     profitloss = serializers.SerializerMethodField()
     profitloss_margin = serializers.SerializerMethodField()
 
@@ -28,7 +29,8 @@ class PortfolioSerializer(serializers.ModelSerializer):
 
     class Meta:
         model  = Portfolio
-        fields = '__all__'
+        fields = ('id','user','symbol','number','value','profitloss','profitloss_margin')
+        # fields = '__all__'
 
 class PortfolioEntireSerializer(serializers.ModelSerializer):
     username = serializers.ReadOnlyField(source = 'user.username')
