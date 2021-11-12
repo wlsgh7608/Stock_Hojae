@@ -1,9 +1,11 @@
 from django.urls import path
-from .views import individual_stock_update,entire_stock_update
+from .views import currentStocklist,individual_stock_update,entire_stock_update
 app_name = 'stock'
 
 
 urlpatterns = [
+    path('api/current/',currentStocklist.as_view()),
     path('',entire_stock_update),
     path('list/<str:symbol>/',individual_stock_update)
+    
 ]

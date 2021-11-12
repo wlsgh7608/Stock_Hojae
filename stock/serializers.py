@@ -26,4 +26,4 @@ class BalanceSheetSerializer(serializers.ModelSerializer):
 class CurrentStockSerializer(serializers.ModelSerializer):
     class Meta:
         model = CurrentStock
-        fields = '__all__'
+        fields = ['symbol','close','open','high','low','volume','change','date']

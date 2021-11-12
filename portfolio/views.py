@@ -33,6 +33,8 @@ class PortfolioNameListView(APIView):
     """
     def get(self,request,*args,**kwargs):
         user_portfolios = PortfolioName.objects.filter(user = request.user)
+        if not user_portfolios:
+            return Response({"message":"does not exist"},status=404)
         serializer = PortfolioNameSerializer(user_portfolios,many = True)
         return Response(serializer.data)
 

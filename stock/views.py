@@ -9,12 +9,16 @@ import pandas as pd
 import datetime
 from rest_framework.decorators import api_view
 from time import sleep
+from rest_framework.generics import ListAPIView
 # Create your views here.
 
-def get_stocklist(self,symbol):
-    stock = CurrentStock.objects.filter(symbol = symbol)
-    serializer = CurrentStockSerializer(stock)
-    return Response(serializer.data)
+class currentStocklist(ListAPIView):
+    """
+    최신날짜 주식정보 출력
+    """
+    queryset = CurrentStock.objects.all()
+    serializer_class = CurrentStockSerializer
+
 
 def current_stock_update(symbol,company_data,close,open,high,low,volume,change,date):
     isexist = CurrentStock.objects.filter(symbol = symbol)
@@ -75,10 +79,10 @@ def individual_stock_update(self,symbol):
 def entire_stock_update(request):
     company_list = UsStocklist.objects.all()
     for i,company in enumerate(company_list):
-        if i>160:
+        if i>= 80:
             print(i,company,"update")
             stock_update(company)
-            sleep(2)
+            sleep(3)
     return Response({"message":"entire update success"},status = 200)
     # tsla_date = UsCompanyDaily.objects.filter(company_code__in = company).first().stock_date
     # next_date = tsla_date+datetime.timedelta(days=1)

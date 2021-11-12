@@ -18,7 +18,7 @@ class PortfolioName(models.Model):
 
 class Portfolio(models.Model):
     portfolio = models.ForeignKey(PortfolioName,on_delete=CASCADE)
-    symbol = models.CharField(max_length=20) # 현금, 부동산 등 주식리스트에 없을 수 있음
+    symbol = models.CharField(max_length=20) # 현금, 부동산 등 주식리스트에 없을 수 있음 -> foreignkey 사용 X
     number = models.PositiveIntegerField()
     value = models.FloatField()
 

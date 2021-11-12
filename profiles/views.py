@@ -58,6 +58,8 @@ class TodoListView(APIView):
     @LoginConfirm
     def get(self,request,*args,**kwargs):
         user_todo = TodoList.objects.filter(user = request.user)
+        if not user_todo:
+            return Response({"message":"todo does not exist"})
         serializer = TodolistSerializer(user_todo,many = True)
         return Response(serializer.data)
 
