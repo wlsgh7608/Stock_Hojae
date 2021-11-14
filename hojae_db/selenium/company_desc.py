@@ -26,25 +26,16 @@ for i,ticker in enumerate(df):
     search_key = ticker
     print(i,ticker)
     driver.get('https://m.stock.naver.com/searchItem?searchType=init')
+    sleep(0.5)
     elem = driver.find_element_by_class_name("Nbox_input_text")
     elem.send_keys(search_key)
-    # elem.send_keys(Keys.RETURN)
-    sleep(1)
-    url = "http://m.stock.naver.com/index.html#/worldstock/stock/"+ticker+".O/overview"
-    if '.' in ticker:
-        print("yes",ticker)
-        a,b = ticker.split('.')
-        b = b.lower()
-        print(a,b)
-        ticker = a+b
-        url = "http://m.stock.naver.com/index.html#/worldstock/stock/"+ticker+"/overview"
+    sleep(0.5)
+    selc = driver.find_element_by_id('a_link')
+    href = selc.get_attribute('href')
+    url = href.replace('total','overview')
+    driver.get(url)
 
-    # print(url)
-
-    # driver.get(url)
     driver.implicitly_wait(3)
-    # images = driver.find_element_by_css_selector('.OverviewContainer_desc__unQ18')
     images = driver.find_element_by_xpath('/html/body/div/div[1]/div[4]/div[2]/p[2]')
-    print(images.text    )
-    # for image in images:
-    #     print(image.text)
+    print(images.text)
+    sleep(1)

@@ -4,12 +4,21 @@ from django.http.response import HttpResponse
 import FinanceDataReader as fdr
 
 from stock.serializers import CurrentStockSerializer
-from .models import CurrentStock, UsCompanyDaily,UsStocklist
+from .models import CurrentStock, UsCompanyDaily,UsStocklist,Stockdesc
 import pandas as pd
 import datetime
 from rest_framework.decorators import api_view
 from time import sleep
 from rest_framework.generics import ListAPIView
+
+# crawling
+import os,sys
+
+sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
+
+from selenium import webdriver
+from selenium.webdriver.common.keys import Keys
+
 # Create your views here.
 
 class currentStocklist(ListAPIView):
@@ -84,29 +93,36 @@ def entire_stock_update(request):
             stock_update(company)
             sleep(3)
     return Response({"message":"entire update success"},status = 200)
-    # tsla_date = UsCompanyDaily.objects.filter(company_code__in = company).first().stock_date
-    # next_date = tsla_date+datetime.timedelta(days=1)
-    # print(symbol,next_date)
-    # symbol_data = fdr.DataReader(symbol,next_date) # 2010년부터 일일데이터 로드
-    # for j,row in enumerate(symbol_data.itertuples()):
-    #     print(row)
-    #     s_date,close,open,  high , low, volume,change  = row # unpacking
-    #     s_date = s_date.strftime("%y-%m-%d")
-    #     volume = int(volume)
-    #     change = round(change,5)
-    #     column = "company_code_id,stock_date,close,open,high,low,volume,change"
-    #     data = symbol,s_date,close,open,high,low,volume,change
-    #     print(data) 
-        # data = c_name,s_date,close,open,high,low,volume,change
 
-        # db.insertDB(schema='public',table='stock_uscompanydaily',column=column,data=data)
 
-    # company_list = fdr.StockListing("NYSE")[:50]
-    # company_list = pd.concat(company_list, ignore_index=True)
-    # print(company_list)
-    # context = {'company_list':company_list}
-    # return render(request,'stock/company_list.html',context)
-    return Response({'message':'good'})
+@api_view(['GET'])
+def entire_stock_desc(request):
+    objects = UsStocklist.objects.all()
+    driver = webdriver.Chrome('C:/Users/Jinho/DjangoProjects/hojae/stock/chromedriver.exe')
+    for i,object in enumerate(objects):
+
+        ticker = object.symbol
+        search_key = ticker
+        print(i,ticker)
+        driver.get('https://m.stock.naver.com/searchItem?searchType=init')
+        sleep(0.5)
+        elem = driver.find_element_by_class_name("Nbox_input_text")
+        elem.send_keys(search_key)
+        sleep(0.5)
+        selc = driver.find_element_by_id('a_link')
+        href = selc.get_attribute('href')
+        url = href.replace('total','overview')
+        driver.get(url)
+
+        driver.implicitly_wait(3)
+        images = driver.find_element_by_xpath('/html/body/div/div[1]/div[4]/div[2]/p[2]')
+        desc = images.text
+        print(len(desc))
+        symbol = UsStocklist.objects.get(symbol = ticker)
+        Stockdesc.objects.create(symbol = symbol,description = desc)
+
+        sleep(1)
+    return Response({"message":"entire description success"},status = 200)
 
 
 
