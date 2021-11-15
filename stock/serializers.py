@@ -1,6 +1,6 @@
 from django.db.models import fields
 from rest_framework import serializers
-from stock.models import IncomeStatement, UsCompanyDaily, UsStocklist,BalanceSheet,CurrentStock
+from stock.models import IncomeStatement, Stockdesc, UsCompanyDaily, UsStocklist,BalanceSheet,CurrentStock
 class UsStockListSerializer(serializers.ModelSerializer):
     class Meta:
         model = UsStocklist
@@ -27,3 +27,8 @@ class CurrentStockSerializer(serializers.ModelSerializer):
     class Meta:
         model = CurrentStock
         fields = ['symbol','close','open','high','low','volume','change','date']
+
+class StockDescSerialzier(serializers.ModelSerializer):
+    class Meta:
+        model = Stockdesc
+        fields = '__all__'

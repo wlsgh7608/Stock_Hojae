@@ -88,15 +88,17 @@ class PortfolioListView(APIView):
     """
     def get(self,request,portfolio_name_id,*args,**kwargs):
         portfolios = Portfolio.objects.filter(portfolio = portfolio_name_id)
-        serializer = PortfolioSerializer(portfolios,many = True)
-        return Response(serializer.data)
+        if portfolios:
+            serializer = PortfolioSerializer(portfolios,many = True)
+            return Response(serializer.data)
+        else:
+            return Response({"message":"portfolioName does not exist"},status = 404)
 
     @LoginConfirm
     def post(self,request,portfolio_name_id,*args,**kwargs):
         if len(Portfolio.objects.filter(portfolio = portfolio_name_id))>=30:
             return Response({"message":"포트폴리오당 종목은 최대 30개까지 가능합니다."})
         portfolioName = PortfolioName.objects.get(pk = portfolio_name_id)
-        print(portfolioName)
         serializer = PortfolioSerializer(data = request.data)
         if serializer.is_valid() :
             if request.user == portfolioName.user:
@@ -122,7 +124,7 @@ class PortfolioDetailView(APIView):
     def put(self,request,portfolio_id,*args,**kwargs):
         portfolio = Portfolio.objects.get(pk = portfolio_id) or None
         if portfolio:
-            if portfolio.user != request.user:
+            if portfolio.portfolio.user != request.user:
                 return Response({"message":"different user!"},status = 400)
             serializer = PortfolioSerializer(data = request.data, instance=portfolio)
             if serializer.is_valid():
@@ -135,7 +137,7 @@ class PortfolioDetailView(APIView):
     def delete(self,request,portfolio_id,*args,**kwargs):
         portfolio = Portfolio.objects.get(pk = portfolio_id)
         if portfolio:
-            if portfolio.user!= request.user:
+            if portfolio.portfolio.user!= request.user:
                 return Response({"message":"different user!"},status=  400)
             portfolio.delete()
             return Response({"message":"portfolio deleted"})

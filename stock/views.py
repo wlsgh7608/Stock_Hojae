@@ -1,9 +1,10 @@
+from rest_framework import generics
 from rest_framework.response import Response
 from django.shortcuts import render
 from django.http.response import HttpResponse
 import FinanceDataReader as fdr
 
-from stock.serializers import CurrentStockSerializer
+from stock.serializers import CurrentStockSerializer, StockDescSerialzier
 from .models import CurrentStock, UsCompanyDaily,UsStocklist,Stockdesc
 import pandas as pd
 import datetime
@@ -88,10 +89,10 @@ def individual_stock_update(self,symbol):
 def entire_stock_update(request):
     company_list = UsStocklist.objects.all()
     for i,company in enumerate(company_list):
-        if i>= 80:
-            print(i,company,"update")
-            stock_update(company)
-            sleep(3)
+        
+        print(i,company,"update")
+        stock_update(company)
+        sleep(3)
     return Response({"message":"entire update success"},status = 200)
 
 
@@ -124,7 +125,15 @@ def entire_stock_desc(request):
         sleep(1)
     return Response({"message":"entire description success"},status = 200)
 
+class StockDescList(generics.ListAPIView):
+    queryset = Stockdesc.objects.all()
+    serializer_class = StockDescSerialzier
+    lookup_field = 'symbol'
 
-
+class StockDescDetail(generics.RetrieveAPIView):
+    queryset = Stockdesc.objects.all()
+    serializer_class = StockDescSerialzier
+    lookup_field = 'symbol'
+    
 
 # def stockUpdate(request,)
