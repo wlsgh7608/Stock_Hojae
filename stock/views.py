@@ -1,11 +1,12 @@
-from rest_framework import generics
+from rest_framework import generics, serializers
 from rest_framework.response import Response
 from django.shortcuts import render
 from django.http.response import HttpResponse
 import FinanceDataReader as fdr
+from rest_framework.views import APIView
 
-from stock.serializers import CurrentStockSerializer, StockDescSerialzier
-from .models import CurrentStock, UsCompanyDaily,UsStocklist,Stockdesc
+from stock.serializers import BalanceSheetSerializer, CurrentStockSerializer, StockDescSerialzier,StockPageEntireSerializer, UsStockListSerializer
+from .models import BalanceSheet, CurrentStock, UsCompanyDaily,UsStocklist,Stockdesc
 import pandas as pd
 import datetime
 from rest_framework.decorators import api_view
@@ -126,14 +127,23 @@ def entire_stock_desc(request):
     return Response({"message":"entire description success"},status = 200)
 
 class StockDescList(generics.ListAPIView):
-    queryset = Stockdesc.objects.all()
+    # queryset = Stockdesc.objects.all()
     serializer_class = StockDescSerialzier
     lookup_field = 'symbol'
+    def get_queryset(self):
+        print(self.kwargs)
+        # original qs
+        qs = super().get_queryset() 
+        # filter by a variable captured from url, for example
+        return qs.filter(name__startswith=self.kwargs['name'])
 
 class StockDescDetail(generics.RetrieveAPIView):
     queryset = Stockdesc.objects.all()
     serializer_class = StockDescSerialzier
     lookup_field = 'symbol'
-    
 
-# def stockUpdate(request,)
+
+class StockEntire(generics.RetrieveAPIView):
+    queryset = UsStocklist.objects.all()
+    serializer_class = StockPageEntireSerializer
+    lookup_field = 'symbol'

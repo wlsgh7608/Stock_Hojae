@@ -1,14 +1,16 @@
 from django.urls import path
-from .views import currentStocklist,individual_stock_update,entire_stock_update,entire_stock_desc,StockDescList,StockDescDetail
+from .views import currentStocklist,individual_stock_update,entire_stock_update,entire_stock_desc,StockDescList,StockDescDetail,StockEntire
 app_name = 'stock'
-
+"""
+/stock/api/
+"""
 
 urlpatterns = [
     path('api/current/',currentStocklist.as_view()),
     path('',entire_stock_update),
     path('list/<str:symbol>/',individual_stock_update),
-    path('desc/',StockDescList.as_view()),
-    path('desc/<str:symbol>/',StockDescDetail.as_view())
-    # path('api/desc/',entire_stock_desc)
+    path('description/',StockDescList.as_view()),
+    path('description/<str:symbol>/',StockDescDetail.as_view()),
+    path('description/entire/<str:symbol>/',StockEntire.as_view()),
     
 ]
