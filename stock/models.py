@@ -87,3 +87,22 @@ class Stockdesc(models.Model):
     """
     symbol = models.OneToOneField(UsStocklist,on_delete= models.CASCADE)
     description = models.CharField(max_length=1024,default= '')
+
+class News(models.Model):
+    symbol = models.ForeignKey(UsStocklist,on_delete=models.CASCADE)
+    dae = models.DateField()
+    title = models.CharField(max_length=256)
+    url = models.CharField(max_length=128)
+    content = models.CharField(max_length=5000)
+    translation = models.CharField(blank=True,default='',max_length=512)
+
+class Newscontents(models.Model):
+    symbol = models.ForeignKey(UsStocklist,on_delete=models.CASCADE)
+    date = models.DateField()
+    title = models.CharField(max_length=256)
+    url = models.CharField(max_length=128)
+    content = models.CharField(max_length=5000)
+    translation = models.CharField(blank=True,default='',max_length=5000)
+    summary = models.CharField(blank=True,default='',max_length=512)
+
+
