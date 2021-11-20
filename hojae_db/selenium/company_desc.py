@@ -31,7 +31,7 @@ for i,ticker in enumerate(df):
     elem.send_keys(search_key)
     sleep(0.5)
     selc = driver.find_element_by_id('a_link')
-    href = selc.get_attribute('href')
+    href = selc.get_attribute('href')   
     url = href.replace('total','overview')
     driver.get(url)
 

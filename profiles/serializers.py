@@ -2,7 +2,7 @@ from rest_framework import serializers
 from rest_framework_jwt.settings import api_settings
 from django.contrib.auth import get_user_model
 
-from profiles.models import TodoList
+from profiles.models import BookMark, TodoList
 # from .models import User
 
 User = get_user_model()
@@ -40,7 +40,10 @@ class TodolistSerializer(serializers.ModelSerializer):
         fields = ('id','todolist')
 
 
-
+class BookMarkSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BookMark
+        fields = '__all__'
 
 # class UserCreateSerializer(serializers.Serializer):
 #     email = serializers.EmailField(required=True)

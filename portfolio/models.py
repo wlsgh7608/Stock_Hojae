@@ -11,6 +11,7 @@ User = get_user_model()
 class PortfolioName(models.Model):
     user = models.ForeignKey(User,on_delete=CASCADE)
     name = models.CharField(max_length=30)
+    isshare = models.BooleanField(default = False)
 
     def __str__(self):
         return self.name

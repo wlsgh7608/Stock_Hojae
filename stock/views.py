@@ -1,3 +1,4 @@
+from django.db import reset_queries
 from rest_framework import generics, serializers
 from rest_framework.response import Response
 from django.shortcuts import render
@@ -6,16 +7,17 @@ import FinanceDataReader as fdr
 from rest_framework.views import APIView
 
 from stock.serializers import BalanceSheetSerializer, CurrentStockSerializer, StockDescSerialzier,StockPageEntireSerializer, UsStockListSerializer
-from .models import BalanceSheet, CurrentStock, UsCompanyDaily,UsStocklist,Stockdesc
+from .models import BalanceSheet, CurrentStock, Newscontents, UsCompanyDaily,UsStocklist,Stockdesc
 import pandas as pd
 import datetime
 from rest_framework.decorators import api_view
 from time import sleep
 from rest_framework.generics import ListAPIView
 
+import requests, json
 # crawling
 import os,sys
-
+from datetime import datetime
 sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
 
 from selenium import webdriver
@@ -147,3 +149,125 @@ class StockEntire(generics.RetrieveAPIView):
     queryset = UsStocklist.objects.all()
     serializer_class = StockPageEntireSerializer
     lookup_field = 'symbol'
+
+
+import pandas as pd
+import re
+from selenium import webdriver
+from selenium.webdriver.common.keys import Keys
+from time import sleep
+
+
+
+
+
+def crawl_news(ticker,driver):
+    driver.get('https://www.stockwatch.com/Quote/Detail?U:'+ticker)
+    table = driver.find_element_by_id("MainContent_NewsList1_Table1_Table1")
+    tbody = table.find_element_by_tag_name("tbody")
+    rows = tbody.find_elements_by_tag_name("tr")
+    href_url = []
+    alist = table.find_elements_by_tag_name('a')
+    for i,ahref in enumerate(alist):
+        if i%2==0:
+            continue
+        news_url = ahref.get_attribute('href')
+        href_url.append(news_url)
+    sleep(1)
+    df = []
+    for index, value in enumerate(rows):
+        body = value.find_elements_by_tag_name("td")
+        line = []
+        for j , content in enumerate(body):
+            line.append(content.text)
+        line.append(href_url[index])
+        df.append(line)
+    df_tbl = pd.DataFrame(df,columns=('date','symbol','release','title','url'))   #index 지정
+    df_tbl.drop("symbol",axis=1,inplace=True) # 불필요한 column 제거
+    df_tbl.drop("release",axis=1,inplace=True) # 불필요한 column 제거
+    print(df_tbl)
+    return df_tbl
+
+def get_contents_news(news_url,driver):
+    news_list = []
+    for url in news_url:
+        driver.get(url)
+        contents = driver.find_element_by_id('MainContent_NewsText').text
+        contents = re.sub('\n','',contents) # 개행 제거
+        contents = re.sub('\t','',contents)
+        if len(contents)>5000:
+            contents = contents[:5000]
+        news_list.append(contents)
+    return news_list
+
+
+# def news_translate(news):
+#     tl = Pororo(task="translation", lang="multi")
+#     summ_tool = Pororo(task="summarization", model="abstractive", lang="ko")
+#     tl = tl(news,src='en',tgt='ko')
+#     summ = summ_tool(tl, model="abstractive", lang="ko")
+#     return summ
+
+
+
+def get_dataframe(ticker):
+    driver = webdriver.Chrome('C:/Users/Jinho/DjangoProjects/hojae/stock/chromedriver.exe')
+
+    news_df = crawl_news(ticker,driver) #
+    # if news_df:
+    news_df = news_df.loc[:4,]
+    news_url = news_df["url"] # 뉴스 링크
+    news_list = get_contents_news(news_url,driver)
+    news_df["contents"] = news_list # 영어 본문 column 추가
+    return news_df
+    # else:
+    #     return None
+
+
+
+@api_view(['GET'])
+def entire_stock_news(request):
+    objects = UsStocklist.objects.all()
+
+    
+    for i,object in enumerate(objects):
+        if i>=148:
+            ticker = object.symbol
+            print(i,ticker)
+            symbol = UsStocklist.objects.get(symbol = ticker)
+            news_df = get_dataframe(ticker)
+            # if news_df != None:
+            for i,news in enumerate(news_df.itertuples()):
+                _,date,title,url,content = news
+                date = date.split(' ')[0]
+                Newscontents.objects.create(symbol = symbol,date = date,title=title,url = url, content = content )
+
+            sleep(1)
+    return Response({"message":"entire description success"},status = 200)
+
+
+def entire_news_tranlate(request):
+
+    objects = Newscontents.objects.all()
+    for i,object in enumerate(objects):
+        if i==0:
+            # print(object.content)
+            # url = 'https://openapi.naver.com/v1/papago/n2mt'
+            # CLIENT_ID = 'SNh7rE2sRKalR1ZtUXvY'
+            # CLIENT_SECRET = 'ITlIneA0zE'
+
+            # headers = {
+            #     "Content-Type" : "application/json",
+            #     "X-Naver-Client-Id" : CLIENT_ID,
+            #     "X-Naver-Client-Secret":CLIENT_SECRET
+            # }
+            # params = {
+            #     "source" : "en",
+            #     "target" : "ko",
+            #     "text" : object.content
+            # }
+            # response = requests.post(url,json.dumps(params),headers = headers)
+            # msg = response.json()["message"]["result"]["translatedText"]
+            object.translation = "good"
+            object.save()
+            print(object)

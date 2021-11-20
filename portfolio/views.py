@@ -72,6 +72,8 @@ class PortfolioNameDetailView(APIView):
             return Response(serializer.errors,status = 400)
         return Response({"message":"portfolio does not exist"},status = 404)
     
+
+    
     @LoginConfirm
     def delete(self,request,portfolio_name_id,*args,**kwargs):
         portfolio = PortfolioName.objects.get(pk = portfolio_name_id)

@@ -4,6 +4,8 @@ import jwt
 
 # Create your views here.
 from rest_framework import permissions
+from rest_framework import generics
+from rest_framework import serializers
 from rest_framework.fields import ReadOnlyField
 from rest_framework.generics import CreateAPIView
 from rest_framework.serializers import Serializer
@@ -11,11 +13,11 @@ from rest_framework.views import APIView
 from django.contrib.auth import get_user_model
 from hojae.settings import SECRET_KEY
 from core.utils import LoginConfirm 
-from .serializers import  UserSerializer,TodolistSerializer
+from .serializers import  UserSerializer,TodolistSerializer,BookMarkSerializer
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_jwt.authentication import JSONWebTokenAuthentication
 from rest_framework.response import Response
-from .models import TodoList
+from .models import TodoList,BookMark
 # from .models import UserTodoList
 User = get_user_model()
 class CreateUserView(CreateAPIView):
@@ -109,5 +111,46 @@ class TodoDetail(APIView):
             return Response({"message":"todo deleted"})
         return Response({"message":"todo does not exist"},status = 404)
 
+
+class BookMarkList(APIView):
+    permission_classes = [IsAuthenticated]
+
+    @LoginConfirm
+    def get(self,request,*args,**kwargs):
+        queryset = BookMark.objects.filter(user = request.user)
+        if not queryset:
+            return Response({"message":"bookmark does not exist"})
+        serializer = BookMarkSerializer(queryset,many= True)
+        return Response(serializer.data)
+
+    @LoginConfirm
+    def post(self,request,*args,**kwargs):
+        symbol = request.headers.get("symbol",None)
+        serializer = BookMarkSerializer(request.data)
+        if serializer.is_valid():
+            serializer.save(user = request.user,bookmark_symbol = symbol)
+            return Response(serializer.data,status = 201)
+        else:
+            return Response(serializer.errors)
+
+
+class BookMarkDetail(APIView):
+    permission_classes = [IsAuthenticated]
+
+    @LoginConfirm
+    def get(self,request,symbol,*args,**kwargs):
+        queryset = BookMark.objects.filter(user = request.user).filter(bookmark_symbol = symbol)
+        serializer = BookMarkSerializer(queryset,many= True)
+        return Response(serializer.data)
+
+    @LoginConfirm
+    def delete(self,request,bookmark_id,*args,**kwargs):
+        bookmark = BookMark.objects.get(pk = bookmark_id)
+        if bookmark:
+            if bookmark.user!= request.user:
+                return Response({"message":"different user!"},status=  400)
+            bookmark.delete()
+            return Response({"message":"bookmark deleted"})
+        return Response({"message":"bookmark does not exist"},status = 404)
 
 
