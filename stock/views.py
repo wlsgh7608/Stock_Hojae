@@ -1,4 +1,5 @@
 from django.db import reset_queries
+from django.db.models import query
 from rest_framework import generics, serializers
 from rest_framework.response import Response
 from django.shortcuts import render
@@ -6,7 +7,7 @@ from django.http.response import HttpResponse
 import FinanceDataReader as fdr
 from rest_framework.views import APIView
 
-from stock.serializers import BalanceSheetSerializer, CurrentStockSerializer, StockDescSerialzier,StockPageEntireSerializer, UsStockListSerializer
+from stock.serializers import BalanceSheetSerializer, CurrentStockSerializer, StockDescSerialzier,StockPageEntireSerializer, UsStockListSerializer,NewsContentsSerializer
 from .models import BalanceSheet, CurrentStock, Newscontents, UsCompanyDaily,UsStocklist,Stockdesc
 import pandas as pd
 import datetime
@@ -251,23 +252,42 @@ def entire_news_tranlate(request):
     objects = Newscontents.objects.all()
     for i,object in enumerate(objects):
         if i==0:
-            # print(object.content)
-            # url = 'https://openapi.naver.com/v1/papago/n2mt'
-            # CLIENT_ID = 'SNh7rE2sRKalR1ZtUXvY'
-            # CLIENT_SECRET = 'ITlIneA0zE'
+            print(object.content)
+            url = 'https://openapi.naver.com/v1/papago/n2mt'
+            CLIENT_ID = 'SNh7rE2sRKalR1ZtUXvY'
+            CLIENT_SECRET = 'ITlIneA0zE'
 
-            # headers = {
-            #     "Content-Type" : "application/json",
-            #     "X-Naver-Client-Id" : CLIENT_ID,
-            #     "X-Naver-Client-Secret":CLIENT_SECRET
-            # }
-            # params = {
-            #     "source" : "en",
-            #     "target" : "ko",
-            #     "text" : object.content
-            # }
-            # response = requests.post(url,json.dumps(params),headers = headers)
-            # msg = response.json()["message"]["result"]["translatedText"]
+            headers = {
+                "Content-Type" : "application/json",
+                "X-Naver-Client-Id" : CLIENT_ID,
+                "X-Naver-Client-Secret":CLIENT_SECRET
+            }
+            params = {
+                "source" : "en",
+                "target" : "ko",
+                "text" : object.content
+            }
+            response = requests.post(url,json.dumps(params),headers = headers)
+            msg = response.json()["message"]["result"]["translatedText"]
             object.translation = "good"
             object.save()
             print(object)
+
+class NewsContentsList(APIView):
+    def get(self,request,symbol,*args,**kwargs):
+        stock = UsStocklist.objects.filter(symbol=symbol).exists # 해당 blog 댓글
+        if stock:
+            symbol = UsStocklist.objects.get(symbol = symbol)
+            queryset = Newscontents.objects.filter(symbol = symbol)
+            print(queryset)
+            if queryset:
+                serializer = NewsContentsSerializer(queryset,many =True)
+                return Response(serializer.data)
+            return Response({"message": "news does not exist"})
+            
+        else:
+            return Response({"message":"stock does not exist"})
+
+class NewsEntireList(generics.ListAPIView):
+    queryset = Newscontents.objects.all()
+    serializer_class = NewsContentsSerializer

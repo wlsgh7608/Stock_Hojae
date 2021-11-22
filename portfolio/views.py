@@ -4,11 +4,12 @@ from rest_framework.views import APIView
 
 from core.utils import LoginConfirm
 from .models import PortfolioName,Portfolio
-from rest_framework import generics
+from rest_framework import generics, serializers
 from .serializers import PortfolioNameSerializer,PortfolioEntireSerializer, PortfolioSerializer
 from rest_framework.response import Response
 # Create your views here.
 
+from django.utils import timezone
 
 
 class PortfolioList(generics.ListCreateAPIView):
@@ -144,3 +145,34 @@ class PortfolioDetailView(APIView):
             portfolio.delete()
             return Response({"message":"portfolio deleted"})
         return Response({"message":"portfolio does not exist"},status = 404)
+    
+
+class PortfolioShare(APIView):
+    @LoginConfirm
+    def get(self,request,portfolio_name_id, *args,**kwargs):
+        portfolioname = PortfolioName.objects.filter(pk= portfolio_name_id).exists()
+        if portfolioname:
+            object = PortfolioName.objects.get(pk = portfolio_name_id)
+            if object.user != request.user:
+                return Response({"message": "diffrent user"})
+            else:
+                if object.isshare == True:
+                    object.isshare = False
+                elif object.isshare == False:
+                    object.isshare = True
+                    object.share_date = timezone.now()
+                object.save()
+                return Response({"message": "share function success"})
+        else:
+            return Response({"message":"portfolio does not exist"})
+
+
+class PortfolioShareList(APIView):
+    
+    def get(self,request,*args,**kwargs):
+        objects = PortfolioName.objects.filter(isshare = True)
+        if objects:
+            serializer = PortfolioNameSerializer(objects, many = True)
+            return Response(serializer.data)
+        else:
+            return Response({"message" : "portfolioname does not exist"})

@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import PortfolioNameListView,PortfolioNameDetailView,PortfolioListView,PortfolioDetailView
+from .views import PortfolioNameListView,PortfolioNameDetailView,PortfolioListView,PortfolioDetailView,PortfolioShare,PortfolioShareList
 """
 CLIENT
 Base ENDPOINT   /portfolio/
@@ -17,8 +17,9 @@ Base ENDPOINT   /portfolio/
 urlpatterns = [
     path('user/',PortfolioNameListView.as_view()),
     path('user/<int:portfolio_name_id>/',PortfolioNameDetailView.as_view()),
-    
+    path('share/<int:portfolio_name_id>/',PortfolioShare.as_view()),
     path('list/<int:portfolio_name_id>/',PortfolioListView.as_view()), # portfolio 해당하는 종목 출력
     path('<int:portfolio_id>/',PortfolioDetailView.as_view()),
+    path('share/list/',PortfolioShareList.as_view())
 
 ]

@@ -103,6 +103,8 @@ class Newscontents(models.Model):
     url = models.CharField(max_length=128)
     content = models.CharField(max_length=5000)
     translation = models.CharField(blank=True,default='',max_length=5000)
-    summary = models.CharField(blank=True,default='',max_length=512)
+    title_translation = models.CharField(blank=True,default='',max_length=256)
+    class Meta:
+        ordering = ['-date']
 
 
