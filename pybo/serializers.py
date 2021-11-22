@@ -50,4 +50,5 @@ class CommentSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("내용이 너무 깁니다.(500자)")
         return content
 
+
    

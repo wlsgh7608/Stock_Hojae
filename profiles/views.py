@@ -12,8 +12,8 @@ from rest_framework.serializers import Serializer
 from rest_framework.views import APIView
 from django.contrib.auth import get_user_model
 from hojae.settings import SECRET_KEY
-from core.utils import LoginConfirm 
-from .serializers import  UserSerializer,TodolistSerializer,BookMarkSerializer
+from core.utils import LoginConfirm
+from .serializers import UserSerializer,TodolistSerializer,BookMarkSerializer
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_jwt.authentication import JSONWebTokenAuthentication
 from rest_framework.response import Response
@@ -152,5 +152,6 @@ class BookMarkDetail(APIView):
             bookmark.delete()
             return Response({"message":"bookmark deleted"})
         return Response({"message":"bookmark does not exist"},status = 404)
+
 
 

@@ -45,6 +45,9 @@ class BookMarkSerializer(serializers.ModelSerializer):
         model = BookMark
         fields = '__all__'
 
+
+
+
 # class UserCreateSerializer(serializers.Serializer):
 #     email = serializers.EmailField(required=True)
 #     username = serializers.CharField(required=True)
