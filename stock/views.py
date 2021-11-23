@@ -14,7 +14,7 @@ import datetime
 from rest_framework.decorators import api_view
 from time import sleep
 from rest_framework.generics import ListAPIView
-
+from rest_framework.pagination import PageNumberPagination
 import requests, json
 # crawling
 import os,sys
@@ -201,7 +201,7 @@ def get_contents_news(news_url,driver):
         news_list.append(contents)
     return news_list
 
-
+# 리눅스 환경에서만 작동
 # def news_translate(news):
 #     tl = Pororo(task="translation", lang="multi")
 #     summ_tool = Pororo(task="summarization", model="abstractive", lang="ko")
@@ -248,30 +248,31 @@ def entire_stock_news(request):
 
 
 def entire_news_tranlate(request):
-
+    """
+    뉴스제목 번역 api
+    """
     objects = Newscontents.objects.all()
     for i,object in enumerate(objects):
-        if i==0:
-            print(object.content)
-            url = 'https://openapi.naver.com/v1/papago/n2mt'
-            CLIENT_ID = 'SNh7rE2sRKalR1ZtUXvY'
-            CLIENT_SECRET = 'ITlIneA0zE'
+        print(object.title)
+        url = 'https://openapi.naver.com/v1/papago/n2mt'
+        CLIENT_ID = 'SNh7rE2sRKalR1ZtUXvY'
+        CLIENT_SECRET = 'ITlIneA0zE'
 
-            headers = {
-                "Content-Type" : "application/json",
-                "X-Naver-Client-Id" : CLIENT_ID,
-                "X-Naver-Client-Secret":CLIENT_SECRET
-            }
-            params = {
-                "source" : "en",
-                "target" : "ko",
-                "text" : object.content
-            }
-            response = requests.post(url,json.dumps(params),headers = headers)
-            msg = response.json()["message"]["result"]["translatedText"]
-            object.translation = "good"
-            object.save()
-            print(object)
+        headers = {
+            "Content-Type" : "application/json",
+            "X-Naver-Client-Id" : CLIENT_ID,
+            "X-Naver-Client-Secret":CLIENT_SECRET
+        }
+        params = {
+            "source" : "en",
+            "target" : "ko",
+            "text" : object.title
+        }
+        response = requests.post(url,json.dumps(params),headers = headers)
+        msg = response.json()["message"]["result"]["translatedText"]
+        object.title_translation = msg
+        object.save()
+        sleep(1)
 
 class NewsContentsList(APIView):
     def get(self,request,symbol,*args,**kwargs):
@@ -287,7 +288,16 @@ class NewsContentsList(APIView):
             
         else:
             return Response({"message":"stock does not exist"})
+class CustomResultsSetPagination(PageNumberPagination):
+     page_size = 10 
+     page_size_query_param = 'page_size'
+
 
 class NewsEntireList(generics.ListAPIView):
     queryset = Newscontents.objects.all()
     serializer_class = NewsContentsSerializer
+    # pagination_class = CustomResultsSetPagination
+
+class NewsLatest(generics.ListAPIView):
+    queryset = Newscontents.objects.all()[:10]
+    serializer_class =NewsContentsSerializer
