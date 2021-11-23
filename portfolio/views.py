@@ -1,3 +1,4 @@
+from django.core import paginator
 from django.db.models.query import QuerySet
 from django.shortcuts import render
 from rest_framework.views import APIView
@@ -8,7 +9,7 @@ from rest_framework import generics, serializers
 from .serializers import PortfolioNameSerializer,PortfolioEntireSerializer, PortfolioSerializer
 from rest_framework.response import Response
 # Create your views here.
-
+from rest_framework.pagination import PageNumberPagination
 from django.utils import timezone
 
 
@@ -175,4 +176,4 @@ class PortfolioShareList(APIView):
             serializer = PortfolioNameSerializer(objects, many = True)
             return Response(serializer.data)
         else:
-            return Response({"message" : "portfolioname does not exist"})
+            return Response({"message" : "portfoliolist does not exist"})
