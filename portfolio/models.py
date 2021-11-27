@@ -1,3 +1,4 @@
+from os import symlink
 from django.db import models
 from django.contrib.auth import get_user_model
 from django.db.models.deletion import CASCADE
@@ -28,4 +29,20 @@ class Portfolio(models.Model):
     number = models.PositiveIntegerField()
     value = models.FloatField()
 
+class InvestGame(models.Model):
+    """
+    모의투자 계정
+    """
+    user = models.OneToOneField(User,on_delete=models.CASCADE)
+    cash = models.FloatField(default = 10000.0) # 현금
+    
+
+class GamePortfolio(models.Model):
+    """
+    모의투자 종목
+    """
+    game_account = models.ForeignKey(InvestGame,related_name= 'stocks',on_delete=models.CASCADE) # 계정
+    symbol = models.ForeignKey(UsStocklist,on_delete=models.CASCADE)
+    number = models.PositiveIntegerField()
+    value = models.FloatField()
 

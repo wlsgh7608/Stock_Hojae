@@ -4,9 +4,11 @@ from django.shortcuts import render
 from rest_framework.views import APIView
 
 from core.utils import LoginConfirm
-from .models import PortfolioName,Portfolio
+from stock.models import CurrentStock, UsStocklist
+from stock.views import stock_update
+from .models import GamePortfolio, PortfolioName,Portfolio,InvestGame
 from rest_framework import generics, serializers
-from .serializers import PortfolioNameSerializer,PortfolioEntireSerializer, PortfolioSerializer
+from .serializers import InvestGameSerializer, PortfolioNameSerializer,PortfolioEntireSerializer, PortfolioSerializer
 from rest_framework.response import Response
 # Create your views here.
 from rest_framework.pagination import PageNumberPagination
@@ -177,3 +179,88 @@ class PortfolioShareList(APIView):
             return Response(serializer.data)
         else:
             return Response({"message" : "portfoliolist does not exist"})
+
+
+class InvestGameView(APIView):
+    @LoginConfirm
+    def get(self,request,*args,**kwargs):
+        invest = InvestGame.objects.filter(user = request.user)
+        if invest:
+            serializer = InvestGameSerializer(invest,many=True)
+            return Response(serializer.data)
+        return Response({"message":"investgame does not exist"})
+
+    @LoginConfirm
+    def post(self,request):
+        user = request.user
+        if InvestGame.objects.filter(user=request.user).exists():
+            return Response({"message":"investgame alreaey exists"})
+        InvestGame.objects.create(user = user)
+        data = InvestGame.objects.filter(user=user)
+        print(data)
+        serializer = InvestGameSerializer(data)
+        return Response(serializer.data)
+
+class GameStockView(APIView):
+
+    @LoginConfirm
+    def post(self,request,account_id,*args,**kwargs):
+        game_account = InvestGame.objects.get(pk = account_id)
+        if game_account.user != request.user:
+            return Response({"message":"different user!"})
+
+        data = request.data
+        action = data['action']
+
+        stock_list = game_account.stocks.all()
+        isexist = False
+        symbol = UsStocklist.objects.get(symbol = data['symbol'])
+        symbol_data = None
+        for i,stock in enumerate(stock_list):
+                if stock.symbol == symbol: # 현재 모의투자에 해당 symbol 존재 
+                    isexist = True
+                    symbol_data= stock
+                    break
+                
+        if action == 'buy':
+            # serializer = PortfolioSerializer(data = request.data)
+            stock_price = CurrentStock.objects.get(symbol = symbol)
+            if game_account.cash <stock_price.close*int(data['number']):
+                return Response({"message": "can't buy! you need enough cash!"})
+            game_account.cash -= stock_price.close*int(data['number'])
+            game_account.save()
+            if symbol_data:
+                new_number = symbol_data.number + int(data['number'])
+                previous_sum = symbol_data.value*symbol_data.number
+                new_sum = stock_price.close*int(data['number'])
+                symbol_data.value = (previous_sum + new_sum)/new_number
+                symbol_data.number += int(data['number'])
+                symbol_data.save()
+            else:
+                
+                GamePortfolio.objects.create(
+                    game_account = game_account,
+                    symbol = symbol,
+                    number = int(data['number']),
+                    value = stock_price.close,
+                )
+            return Response({"message":"buy success"})
+        elif action == 'sell':
+            if isexist:
+                if int(data['number'])>symbol_data.number: #파려는 수량이 가지고 있는 것보다 많을 경우
+                    return Response({"message": "sell number is more than existing stock number"})
+                stock_price = CurrentStock.objects.get(symbol = symbol)
+                game_account.cash += int(data['number'])*stock_price.close
+                game_account.save()
+                symbol_data.number -= int(data['number'])
+                if symbol_data.number:
+                    symbol_data.save()
+                else:
+                    symbol_data.delete()
+                return Response({"message":"sell success"})
+            
+            else:
+                return Response({"message":"symbol does not exist"})
+
+
+

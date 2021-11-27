@@ -18,7 +18,7 @@ from rest_framework.pagination import PageNumberPagination
 import requests, json
 # crawling
 import os,sys
-from datetime import datetime
+# from datetime import datetime
 sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
 
 from selenium import webdriver
@@ -254,9 +254,14 @@ def entire_news_tranlate(request):
     objects = Newscontents.objects.all()
     for i,object in enumerate(objects):
         print(object.title)
+        if object.title_translation:
+            continue
         url = 'https://openapi.naver.com/v1/papago/n2mt'
-        CLIENT_ID = 'SNh7rE2sRKalR1ZtUXvY'
-        CLIENT_SECRET = 'ITlIneA0zE'
+
+        # CLIENT_ID = 'SNh7rE2sRKalR1ZtUXvY'
+        # CLIENT_SECRET = 'ITlIneA0zE'
+        CLIENT_ID = 'i_8pC2lDwjUX3tizVzyP'
+        CLIENT_SECRET = 'tVQDEBkV0f'
 
         headers = {
             "Content-Type" : "application/json",

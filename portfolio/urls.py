@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import PortfolioNameListView,PortfolioNameDetailView,PortfolioListView,PortfolioDetailView,PortfolioShare,PortfolioShareList
+from .views import GameStockView, PortfolioNameListView,PortfolioNameDetailView,PortfolioListView,PortfolioDetailView,PortfolioShare,PortfolioShareList,InvestGameView
 """
 CLIENT
 Base ENDPOINT   /portfolio/
@@ -20,6 +20,8 @@ urlpatterns = [
     path('share/<int:portfolio_name_id>/',PortfolioShare.as_view()),
     path('list/<int:portfolio_name_id>/',PortfolioListView.as_view()), # portfolio 해당하는 종목 출력
     path('<int:portfolio_id>/',PortfolioDetailView.as_view()),
-    path('share/list/',PortfolioShareList.as_view())
+    path('share/list/',PortfolioShareList.as_view()),
+    path('game/',InvestGameView.as_view()),
+    path('game/detail/<int:account_id>/',GameStockView.as_view()),
 
 ]

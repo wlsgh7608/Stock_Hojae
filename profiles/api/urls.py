@@ -1,7 +1,7 @@
 from django.urls import path
 from rest_framework_jwt.views import obtain_jwt_token,refresh_jwt_token,verify_jwt_token
 
-from ..views import CreateUserView,Check, TodoDetail,UserList,TodoListView,BookMarkList,BookMarkDetail
+from ..views import CreateUserView,Check, TodoDetail,UserList,TodoListView,BookMarkList,BookMarkDetail,KakaoLoginView
 
 """
 CLIENT
@@ -21,4 +21,7 @@ urlpatterns = [
 
     path('bookmark/',BookMarkList.as_view()),
     path('bookmark/<int:bookmark_id>/',BookMarkDetail.as_view()),
+
+
+    path('kakao/login/',KakaoLoginView.as_view()),
 ] 
