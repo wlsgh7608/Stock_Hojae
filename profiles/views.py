@@ -13,6 +13,7 @@ from rest_framework.views import APIView
 from django.contrib.auth import get_user_model
 from hojae.settings import SECRET_KEY
 from core.utils import LoginConfirm
+from stock.models import UsStocklist
 from .serializers import UserSerializer,TodolistSerializer,BookMarkSerializer
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_jwt.authentication import JSONWebTokenAuthentication
@@ -125,8 +126,10 @@ class BookMarkList(APIView):
 
     @LoginConfirm
     def post(self,request,*args,**kwargs):
-        symbol = request.headers.get("symbol",None)
-        serializer = BookMarkSerializer(request.data)
+        symbol_data = request.data['bookmark_symbol']
+        symbol = UsStocklist.objects.get(symbol = symbol_data)
+        print(symbol_data)
+        serializer = BookMarkSerializer(data= request.data)
         if serializer.is_valid():
             serializer.save(user = request.user,bookmark_symbol = symbol)
             return Response(serializer.data,status = 201)

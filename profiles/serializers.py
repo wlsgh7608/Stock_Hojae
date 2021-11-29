@@ -41,9 +41,10 @@ class TodolistSerializer(serializers.ModelSerializer):
 
 
 class BookMarkSerializer(serializers.ModelSerializer):
+    user = serializers.ReadOnlyField(source = 'user.username')
     class Meta:
         model = BookMark
-        fields = '__all__'
+        fields = ('id','user','bookmark_symbol')
 
 
 
