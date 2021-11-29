@@ -45,4 +45,3 @@ class GamePortfolio(models.Model):
     symbol = models.ForeignKey(UsStocklist,on_delete=models.CASCADE)
     number = models.PositiveIntegerField()
     value = models.FloatField()
-

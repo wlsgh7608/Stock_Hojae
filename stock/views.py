@@ -38,7 +38,6 @@ def current_stock_update(symbol,company_data,close,open,high,low,volume,change,d
     isexist = CurrentStock.objects.filter(symbol = symbol)
     if isexist:
         # 존재할시 update
-        print("exist")
         current_stock = CurrentStock.objects.get(symbol = company_data)
         current_stock.close = close
         current_stock.open = open
@@ -49,7 +48,6 @@ def current_stock_update(symbol,company_data,close,open,high,low,volume,change,d
         current_stock.date = date
         current_stock.save()
     else:
-        print("does not exist")
         # 존재하지 않을 시 create
         CurrentStock.objects.create(symbol = company_data,
         close = close,

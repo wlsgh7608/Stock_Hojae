@@ -8,7 +8,7 @@ from stock.models import CurrentStock, UsStocklist
 from stock.views import stock_update
 from .models import GamePortfolio, PortfolioName,Portfolio,InvestGame
 from rest_framework import generics, serializers
-from .serializers import InvestGameSerializer, PortfolioNameSerializer,PortfolioEntireSerializer, PortfolioSerializer
+from .serializers import GameRankSerializer, InvestGameSerializer, PortfolioNameSerializer,PortfolioEntireSerializer, PortfolioSerializer
 from rest_framework.response import Response
 # Create your views here.
 from rest_framework.pagination import PageNumberPagination
@@ -102,6 +102,9 @@ class PortfolioListView(APIView):
 
     @LoginConfirm
     def post(self,request,portfolio_name_id,*args,**kwargs):
+        print(request)
+        print(request.body)
+        print(request.data)
         if len(Portfolio.objects.filter(portfolio = portfolio_name_id))>=30:
             return Response({"message":"포트폴리오당 종목은 최대 30개까지 가능합니다."})
         portfolioName = PortfolioName.objects.get(pk = portfolio_name_id)
@@ -196,8 +199,7 @@ class InvestGameView(APIView):
         if InvestGame.objects.filter(user=request.user).exists():
             return Response({"message":"investgame alreaey exists"})
         InvestGame.objects.create(user = user)
-        data = InvestGame.objects.filter(user=user)
-        print(data)
+        data = InvestGame.objects.get(user=user)
         serializer = InvestGameSerializer(data)
         return Response(serializer.data)
 
@@ -211,6 +213,8 @@ class GameStockView(APIView):
 
         data = request.data
         action = data['action']
+        if int(data['number'])<=0:
+            return Response({"message":"number can't be negative"})
 
         stock_list = game_account.stocks.all()
         isexist = False
@@ -264,3 +268,11 @@ class GameStockView(APIView):
 
 
 
+class InvestGameRank(APIView):
+    def get(self,request):
+        objects = InvestGame.objects.all()
+        if objects:
+            serializer = GameRankSerializer(objects,many=True)
+            sort_serializer = sorted(serializer.data,key = lambda x: x['estimated'],reverse=True)
+            return Response(sort_serializer)
+        return Response({"message":"investgame does not exist"})

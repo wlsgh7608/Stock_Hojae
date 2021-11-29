@@ -70,6 +70,23 @@ class InvestGameSerializer(serializers.ModelSerializer):
     def get_estimated(self,obj):
         # 추정 금액
         game_stocks = obj.stocks.all()
+        print(game_stocks)
+        total = obj.cash
+        for stock in game_stocks:
+            print(stock)
+            total += stock.number * CurrentStock.objects.get(symbol = stock.symbol).close 
+        return total
+    
+    class Meta:
+        model = InvestGame
+        fields = ('id','username','cash','estimated','stocks')
+
+class GameRankSerializer(serializers.ModelSerializer):
+    username = serializers.ReadOnlyField(source  = 'user.username')
+    estimated = serializers.SerializerMethodField()
+    def get_estimated(self,obj):
+        # 추정 금액
+        game_stocks = obj.stocks.all()
         total = obj.cash
         for stock in game_stocks:
             total += stock.number * CurrentStock.objects.get(symbol = stock.symbol).close 
@@ -77,4 +94,4 @@ class InvestGameSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = InvestGame
-        fields = ('id','username','cash','estimated','stocks')
+        fields = ('username','cash','estimated')
