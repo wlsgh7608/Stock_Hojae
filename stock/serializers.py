@@ -49,4 +49,4 @@ class StockPageEntireSerializer(serializers.ModelSerializer):
 class NewsContentsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Newscontents
-        fields = ('id','date','url','title','translation','symbol')
+        fields = ('id','date','url','title','translation','symbol','title_translation')

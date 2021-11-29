@@ -126,15 +126,37 @@ class BookMarkList(APIView):
 
     @LoginConfirm
     def post(self,request,*args,**kwargs):
-        symbol_data = request.data['bookmark_symbol']
-        symbol = UsStocklist.objects.get(symbol = symbol_data)
-        print(symbol_data)
-        serializer = BookMarkSerializer(data= request.data)
-        if serializer.is_valid():
-            serializer.save(user = request.user,bookmark_symbol = symbol)
-            return Response(serializer.data,status = 201)
-        else:
-            return Response(serializer.errors)
+        data = request.data
+        symbol = data['bookmark_symbol']
+        action = data['action']
+        symbol = UsStocklist.objects.get(symbol = symbol)
+        isexist = BookMark.objects.filter(user=request.user).filter(bookmark_symbol = symbol).exists()
+        if action == 'search':
+            if isexist:
+                return Response({"message": "yes"})
+            return Response({"message": "no"})
+        elif action == 'add':
+            if isexist:
+                return Response({"message":"bookmark symbol already exists"})
+            BookMark.objects.create(user =request.user,bookmark_symbol = symbol)
+            return Response({"message":"bookmark add success"})
+        elif action == 'delete':
+            if isexist:
+                object = BookMark.objects.filter(user=request.user).get(bookmark_symbol = symbol)
+                object.delete()
+                return Response({"message":"bookmark delete success"})
+            return Response({"message":"bookmark does not exist"})
+
+        # for bookmark in bookmarks:
+        #     if bookmark.bookmark_symbol == symbol:
+                
+        # print(symbol_data)
+        # serializer = BookMarkSerializer(data= request.data)
+        # if serializer.is_valid():
+        #     serializer.save(user = request.user,bookmark_symbol = symbol)
+        #     return Response(serializer.data,status = 201)
+        # else:
+        #     return Response(serializer.errors)
 
 
 class BookMarkDetail(APIView):

@@ -162,30 +162,33 @@ from time import sleep
 
 def crawl_news(ticker,driver):
     driver.get('https://www.stockwatch.com/Quote/Detail?U:'+ticker)
-    table = driver.find_element_by_id("MainContent_NewsList1_Table1_Table1")
-    tbody = table.find_element_by_tag_name("tbody")
-    rows = tbody.find_elements_by_tag_name("tr")
-    href_url = []
-    alist = table.find_elements_by_tag_name('a')
-    for i,ahref in enumerate(alist):
-        if i%2==0:
-            continue
-        news_url = ahref.get_attribute('href')
-        href_url.append(news_url)
-    sleep(1)
-    df = []
-    for index, value in enumerate(rows):
-        body = value.find_elements_by_tag_name("td")
-        line = []
-        for j , content in enumerate(body):
-            line.append(content.text)
-        line.append(href_url[index])
-        df.append(line)
-    df_tbl = pd.DataFrame(df,columns=('date','symbol','release','title','url'))   #index 지정
-    df_tbl.drop("symbol",axis=1,inplace=True) # 불필요한 column 제거
-    df_tbl.drop("release",axis=1,inplace=True) # 불필요한 column 제거
-    print(df_tbl)
-    return df_tbl
+    try:
+        table = driver.find_element_by_id("MainContent_NewsList1_Table1_Table1")
+        tbody = table.find_element_by_tag_name("tbody")
+        rows = tbody.find_elements_by_tag_name("tr")
+        href_url = []
+        alist = table.find_elements_by_tag_name('a')
+        for i,ahref in enumerate(alist):
+            if i%2==0:
+                continue
+            news_url = ahref.get_attribute('href')
+            href_url.append(news_url)
+        sleep(1)
+        df = []
+        for index, value in enumerate(rows):
+            body = value.find_elements_by_tag_name("td")
+            line = []
+            for j , content in enumerate(body):
+                line.append(content.text)
+            line.append(href_url[index])
+            df.append(line)
+        df_tbl = pd.DataFrame(df,columns=('date','symbol','release','title','url'))   #index 지정
+        df_tbl.drop("symbol",axis=1,inplace=True) # 불필요한 column 제거
+        df_tbl.drop("release",axis=1,inplace=True) # 불필요한 column 제거
+        print(df_tbl)
+        return df_tbl
+    except:
+        return pd.DataFrame()
 
 def get_contents_news(news_url,driver):
     news_list = []
@@ -194,6 +197,7 @@ def get_contents_news(news_url,driver):
         contents = driver.find_element_by_id('MainContent_NewsText').text
         contents = re.sub('\n','',contents) # 개행 제거
         contents = re.sub('\t','',contents)
+        contents = re.sub('   ',' ',contents)
         if len(contents)>5000:
             contents = contents[:5000]
         news_list.append(contents)
@@ -213,7 +217,9 @@ def get_dataframe(ticker):
     driver = webdriver.Chrome('C:/Users/Jinho/DjangoProjects/hojae/stock/chromedriver.exe')
 
     news_df = crawl_news(ticker,driver) #
-    # if news_df:
+    if news_df.empty:
+        print("no")
+        return pd.DataFrame()
     news_df = news_df.loc[:4,]
     news_url = news_df["url"] # 뉴스 링크
     news_list = get_contents_news(news_url,driver)
@@ -230,16 +236,21 @@ def entire_stock_news(request):
 
     
     for i,object in enumerate(objects):
-        if i>=148:
+        if i>=6:
             ticker = object.symbol
             print(i,ticker)
             symbol = UsStocklist.objects.get(symbol = ticker)
             news_df = get_dataframe(ticker)
-            # if news_df != None:
+            if news_df.empty:
+                continue
             for i,news in enumerate(news_df.itertuples()):
                 _,date,title,url,content = news
                 date = date.split(' ')[0]
+                if Newscontents.objects.filter(title = title).exists():
+                    print(ticker,"news exists, terminate")
+                    break
                 Newscontents.objects.create(symbol = symbol,date = date,title=title,url = url, content = content )
+                print(ticker,"news create")
 
             sleep(1)
     return Response({"message":"entire description success"},status = 200)

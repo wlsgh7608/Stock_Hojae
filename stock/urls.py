@@ -17,7 +17,7 @@ urlpatterns = [
     path('news/',NewsEntireList.as_view()),
     path('news/<str:symbol>/',NewsContentsList.as_view()),
     path('latest/news/',NewsLatest.as_view()),
-    # path('entire/news/',entire_stock_news),
+    path('entire/news/',entire_stock_news),
     path('entire/translate/',entire_news_tranlate)
     
 ]
