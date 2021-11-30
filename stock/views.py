@@ -8,7 +8,7 @@ import FinanceDataReader as fdr
 from rest_framework.views import APIView
 
 from stock.serializers import BalanceSheetSerializer, CurrentStockSerializer, StockDescSerialzier,StockPageEntireSerializer, UsStockListSerializer,NewsContentsSerializer
-from .models import BalanceSheet, CurrentStock, Newscontents, UsCompanyDaily,UsStocklist,Stockdesc
+from .models import BalanceSheet, CurrentStock, Newscontents, StockAdditional, UsCompanyDaily,UsStocklist,Stockdesc
 import pandas as pd
 import datetime
 from rest_framework.decorators import api_view
@@ -228,6 +228,45 @@ def get_dataframe(ticker):
     # else:
     #     return None
 
+import yahoo_fin.stock_info as si
+
+class abc(APIView):
+    def get(self,request):
+        objects = UsStocklist.objects.all()
+
+        for i,object in enumerate(objects):
+            if StockAdditional.objects.filter(symbol = object).exists():
+                continue
+            print(object)
+            symbol = object.symbol
+            print(i,symbol)
+            query_symbol = symbol.replace('.','-') # 티커명 yahoofinance에 맞게 변경
+            df = si.get_quote_table(query_symbol)
+
+
+            market_cap = df['Market Cap']
+            eps = df['EPS (TTM)']
+            per = df['PE Ratio (TTM)']
+            if StockAdditional.objects.filter(symbol = object).exists():
+                print('yes')
+                data = StockAdditional.objects.filter(symbol = object)
+                data.market_cap = market_cap
+                data.eps = eps
+                data.per = per
+                data.save()
+            StockAdditional.objects.create(
+                symbol = object,
+                market_cap = market_cap,
+                eps = eps,
+                per = per
+            )
+            sleep(2)
+
+
+
+
+
+
 
 
 @api_view(['GET'])
@@ -236,7 +275,7 @@ def entire_stock_news(request):
 
     
     for i,object in enumerate(objects):
-        if i>=6:
+        if i>=147:
             ticker = object.symbol
             print(i,ticker)
             symbol = UsStocklist.objects.get(symbol = ticker)
@@ -267,10 +306,10 @@ def entire_news_tranlate(request):
             continue
         url = 'https://openapi.naver.com/v1/papago/n2mt'
 
-        # CLIENT_ID = 'SNh7rE2sRKalR1ZtUXvY'
-        # CLIENT_SECRET = 'ITlIneA0zE'
-        CLIENT_ID = 'i_8pC2lDwjUX3tizVzyP'
-        CLIENT_SECRET = 'tVQDEBkV0f'
+        CLIENT_ID = 'SNh7rE2sRKalR1ZtUXvY'
+        CLIENT_SECRET = 'ITlIneA0zE'
+        # CLIENT_ID = 'i_8pC2lDwjUX3tizVzyP'
+        # CLIENT_SECRET = 'tVQDEBkV0f'
 
         headers = {
             "Content-Type" : "application/json",

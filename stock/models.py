@@ -107,4 +107,8 @@ class Newscontents(models.Model):
     class Meta:
         ordering = ['-date']
 
-
+class StockAdditional(models.Model):
+    symbol = models.ForeignKey(UsStocklist,on_delete=models.CASCADE)
+    market_cap = models.CharField(max_length=56)
+    eps = models.CharField(max_length=56)
+    per = models.CharField(max_length=56)

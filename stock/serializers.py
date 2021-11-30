@@ -1,7 +1,7 @@
 from django.db import models
 from django.db.models import fields
 from rest_framework import serializers
-from stock.models import IncomeStatement, Stockdesc, UsCompanyDaily, UsStocklist,BalanceSheet,CurrentStock,Newscontents
+from stock.models import IncomeStatement, StockAdditional, Stockdesc, UsCompanyDaily, UsStocklist,BalanceSheet,CurrentStock,Newscontents
 class UsStockListSerializer(serializers.ModelSerializer):
     class Meta:
         model = UsStocklist
@@ -33,10 +33,16 @@ class StockDescSerialzier(serializers.ModelSerializer):
     class Meta:
         model = Stockdesc
         fields = '__all__'
+class StockAdditoinalSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = StockAdditional
+        fields = '__all__'
+
 
 class StockPageEntireSerializer(serializers.ModelSerializer):
     incomestatement_set = IncomeStatementSerializer(read_only = True,many=True)
     balancesheet_set = BalanceSheetSerializer(read_only= True,many= True)
+    stockadditional_set = StockAdditoinalSerializer(read_only = True,many = True)
     stockdesc = StockDescSerialzier(read_only = True)
     # income = IncomeStatementSerializer(read_only = True,many= True)
     # test = serializers.IntegerField(default = 0)
