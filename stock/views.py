@@ -91,10 +91,11 @@ def individual_stock_update(self,symbol):
 def entire_stock_update(request):
     company_list = UsStocklist.objects.all()
     for i,company in enumerate(company_list):
+        if i>=100:
         
-        print(i,company,"update")
-        stock_update(company)
-        sleep(3)
+            print(i,company,"update")
+            stock_update(company)
+            sleep(1)
     return Response({"message":"entire update success"},status = 200)
 
 
@@ -202,6 +203,9 @@ def get_contents_news(news_url,driver):
             contents = contents[:5000]
         news_list.append(contents)
     return news_list
+
+
+
 
 # 리눅스 환경에서만 작동
 # def news_translate(news):
