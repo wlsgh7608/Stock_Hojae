@@ -7,6 +7,7 @@ charset-normalizer==2.0.6
 colorama==0.4.4
 cssselect==1.1.0
 Django==3.2.8
+django-annoying==0.10.6
 django-cors-headers==3.10.0
 django-filter==21.1
 django-rest-authtoken==2.1.4
@@ -15,6 +16,7 @@ djangorestframework-jwt==1.11.0
 fake-useragent==0.1.11
 feedparser==6.0.8
 finance-datareader==0.9.31
+html5lib==1.1
 idna==3.2
 importlib-metadata==4.8.1
 lxml==4.6.3
@@ -36,9 +38,12 @@ sgmllib3k==1.0.0
 six==1.16.0
 soupsieve==2.2.1
 sqlparse==0.4.2
+torch==1.10.0
 tqdm==4.62.3
+typing_extensions==4.0.0
 urllib3==1.26.7
 w3lib==1.22.0
+webencodings==0.5.1
 websockets==9.1
 yahoo-fin==0.8.9.1
 zipp==3.6.0

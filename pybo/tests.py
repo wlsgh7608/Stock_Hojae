@@ -23,7 +23,8 @@ class PyboTestCase(TestCase):
         self.assertEqual(1,1)
 
     def test_blog_create(self):
-        blog_obj = Blog.objects.create(title = 'create test',body = 'body create test', symbol =self.stock, user = self.user1)
+        stocks = UsStocklist.objects.get(symbol = 'AAPL')
+        blog_obj = Blog.objects.create(title = 'create test',body = 'body create test', symbol = stocks, user = self.user1)
         self.assertEqual(blog_obj.id,3)
 
 
